@@ -1,5 +1,5 @@
 ---
-title: 生涯补全：从Hello World开始的编程之路
+title: 生涯补全：从 Hello World 开始的编程之路
 published: 2022-09-19
 description: 记录我第一次接触编程语言，用C语言敲出HelloWorld的那个下午，以及它如何改变了我对计算机的理解。
 image: ''
