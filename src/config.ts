@@ -46,26 +46,21 @@ export const navBarConfig: NavBarConfig = {
 		LinkPreset.About,
 		{
 			name: "GitHub",
-			url: "https://github.com/你的用户名", // Internal links should not include the base path, as it is automatically added
-			external: true, // Show an external link icon and will open in a new tab
+			url: "https://github.com/JeffQyj",
+			external: true,
 		},
 	],
 };
 
 export const profileConfig: ProfileConfig = {
-	avatar: "assets/images/HDR.jpg", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
+	avatar: "assets/images/HDR.jpg",
 	name: "JEFF",
 	bio: "这里是我的专属短剧片场🎬。不定期更新生活随笔、走心感悟与成长碎记。欢迎光临，一起收集平凡日子里的闪光瞬间。",
 	links: [
 		{
-			name: "Twitter",
-			icon: "fa6-brands:twitter",
-			url: "https://twitter.com/你的用户名",
-		},
-		{
 			name: "GitHub",
 			icon: "fa6-brands:github",
-			url: "https://github.com/你的用户名",
+			url: "https://github.com/JeffQyj",
 		},
 	],
 };
