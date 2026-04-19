@@ -62,6 +62,11 @@ export const profileConfig: ProfileConfig = {
 			icon: "fa6-brands:github",
 			url: "https://github.com/JeffQyj",
 		},
+		{
+			name: "Gitee",
+			icon: "simple-icons:gitee",
+			url: "https://gitee.com/butterfly-dream1",
+		},
 	],
 };
 
