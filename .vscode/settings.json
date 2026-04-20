@@ -13,6 +13,10 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
+  "[markdown]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": null
+  },
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",
     "quickfix.biome": "always",
