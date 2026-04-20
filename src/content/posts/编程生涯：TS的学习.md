@@ -1,9 +1,9 @@
 ---
-title: 生涯补全：TS的学习
+title: 编程生涯：TS的学习
 published: 2022-10-01
 description: 回忆 2022 年 10 月从 JavaScript 转向 TypeScript 的学习历程，记录从「以为TS是新语言」到理解「类型系统」认知升级的过程。
-tags: [前端, TypeScript, JavaScript, 生涯补全]
-category: 生涯补全
+tags: [TypeScript, 前端]
+category: 编程生涯
 draft: false
 lang: zh_CN
 ---
