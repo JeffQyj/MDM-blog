@@ -13,7 +13,7 @@
 
 ### 1.2 frontmatter 规范
 
-所有博客文章必须包含以下 frontmatter 字段，且修改文章内容时无需修改frontmatter 字段内容，撰写文章前参考同分类的文章：
+所有博客文章必须包含以下 frontmatter 字段，且修改文章内容时无需修改frontmatter 字段内容，撰写文章前一定要参考一到两篇同分类的文章：
 
 ```yaml
 ---
