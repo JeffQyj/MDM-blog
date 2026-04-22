@@ -1,6 +1,6 @@
 ---
 title: 编程生涯：从ajax到axios
-published: 2026-04-21
+published: 2023-11-21
 description: 回忆 2023 年 11 月学习 ajax 后立刻转向 axios 的经历，记录那句「恭喜白学」背后的技术迭代与成长感悟。
 tags: [前端, JavaScript]
 category: 编程生涯
