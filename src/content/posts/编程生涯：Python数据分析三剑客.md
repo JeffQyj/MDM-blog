@@ -1,6 +1,6 @@
 ---
 title: 编程生涯：Python数据分析三剑客
-published: 2026-04-25
+published: 2026-01-08
 description: 2026年1月8日，跟着黑马课程系统学习了NumPy、Pandas、Matplotlib数据分析三剑客。从数组运算到表格处理，从数据清洗到可视化绑定，记录这段从「会写Python」到「会用Python做数据分析」的成长历程。
 tags: [Python, 数据分析]
 category: 编程生涯
