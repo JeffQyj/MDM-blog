@@ -2,7 +2,6 @@
 title: 编程生涯：C语言的基础学习
 published: 2022-10-28
 description: 记录我系统学习 C 语言基础的那段日子，翁恺老师的课程让我真正入门，而指针的坑让我明白：编程没有捷径，只有踩过才能真正理解。
-image: ''
 tags: [C语言, 编程基础]
 category: 编程生涯
 draft: false

@@ -1,5 +1,4 @@
 ---
-
 title: 编程生涯：前端框架还得是React
 published: 2023-12-16
 description: 回忆 2023 年 12 月从 Vue 转向 React 的学习历程，记录第一次接触「一切皆组件」思想时的认知冲击与理解。

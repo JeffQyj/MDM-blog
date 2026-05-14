@@ -2,7 +2,6 @@
 title: 编程生涯：IDE的认知
 published: 2022-10-21
 description: 记录我第一次系统了解 IDE 发展史的那个夜晚，从穿孔卡到 AI 编程助手，我意识到工具的进化从来不是偶然。
-image: ''
 tags: [编程工具, IDE]
 category: 编程生涯
 draft: false

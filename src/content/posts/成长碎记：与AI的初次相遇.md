@@ -1,12 +1,11 @@
 ---
-
 title: 成长碎记：与AI的初次相遇
 published: 2022-11-09
 description: 2022年11月，一门普通的人工智能导论课程，开启了我对人工智能的认知之门。那时的我不会想到，这个仅凭三千字期末报告结课的课程，竟成了我与AI故事的起点。
 tags: [成长碎记, AI认知]
 category: 成长碎记
 draft: false
-lang: zh\_CN
+lang: zh_CN
 ---
 
 :::tip

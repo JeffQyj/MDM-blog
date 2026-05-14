@@ -1,5 +1,4 @@
 ---
-
 title: 编程生涯：TS、JAVA、PYTHON三语言全栈框架认知
 published: 2026-02-12
 description: 2026年2月12日，系统梳理TypeScript、Java、Python三门语言的主流全栈开发框架，从框架设计哲学、核心优势到适用场景，帮你建立完整的全栈框架认知地图。
