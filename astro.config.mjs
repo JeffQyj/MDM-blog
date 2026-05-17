@@ -10,6 +10,7 @@ import icon from "astro-icon";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeComponents from "rehype-components"; /* Render the custom directive content */
 import rehypeKatex from "rehype-katex";
+import rehypeMermaid from "rehype-mermaid";
 import rehypeSlug from "rehype-slug";
 import remarkDirective from "remark-directive"; /* Handle directives */
 import remarkGithubAdmonitionsToDirectives from "remark-github-admonitions-to-directives";
@@ -153,6 +154,7 @@ export default defineConfig({
 					},
 				},
 			],
+			[rehypeMermaid, { renderer: "direct" }],
 		],
 	},
 	vite: {
