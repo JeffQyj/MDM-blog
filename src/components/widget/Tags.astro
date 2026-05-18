@@ -1,5 +1,5 @@
 ---
-
+import { Icon } from "astro-icon/components";
 import I18nKey from "../../i18n/i18nKey";
 import { i18n } from "../../i18n/translation";
 import { getTagList } from "../../utils/content-utils";
@@ -9,9 +9,70 @@ import WidgetLayout from "./WidgetLayout.astro";
 
 const tags = await getTagList();
 
-const COLLAPSED_HEIGHT = "7.5rem";
+function getFirstLetter(str: string): string {
+	const firstChar = str.charAt(0);
+	if (/^[a-zA-Z]/.test(firstChar)) {
+		return firstChar.toUpperCase();
+	}
+	const code = firstChar.charCodeAt(0);
+	if (code < 0x4e00 || code > 0x9fff) {
+		return "#";
+	}
+	const collator = new Intl.Collator("zh-CN");
+	const letters = "ABCDEFGHJKLMNOPQRSTWXYZ".split("");
+	const sampleChars: Record<string, string> = {
+		A: "阿",
+		B: "八",
+		C: "擦",
+		D: "搭",
+		E: "鹅",
+		F: "发",
+		G: "噶",
+		H: "哈",
+		J: "击",
+		K: "喀",
+		L: "拉",
+		M: "妈",
+		N: "那",
+		O: "哦",
+		P: "趴",
+		Q: "七",
+		R: "然",
+		S: "撒",
+		T: "他",
+		W: "挖",
+		X: "西",
+		Y: "压",
+		Z: "匝",
+	};
+	for (const letter of letters) {
+		if (collator.compare(firstChar, sampleChars[letter]) < 0) {
+			continue;
+		}
+		const nextIndex = letters.indexOf(letter) + 1;
+		if (nextIndex >= letters.length) {
+			return letter;
+		}
+		const nextLetter = letters[nextIndex];
+		if (collator.compare(firstChar, sampleChars[nextLetter]) < 0) {
+			return letter;
+		}
+	}
+	return "Z";
+}
 
-const isCollapsed = tags.length >= 20;
+const groupedTags = new Map<string, typeof tags>();
+tags.forEach((tag) => {
+	const letter = getFirstLetter(tag.name);
+	if (!groupedTags.has(letter)) {
+		groupedTags.set(letter, []);
+	}
+	groupedTags.get(letter)!.push(tag);
+});
+
+const sortedLetters = Array.from(groupedTags.keys()).sort((a, b) =>
+	a.localeCompare(b),
+);
 
 interface Props {
 	class?: string;
@@ -20,12 +81,74 @@ interface Props {
 const className = Astro.props.class;
 const style = Astro.props.style;
 ---
-<WidgetLayout name={i18n(I18nKey.tags)} id="tags" isCollapsed={isCollapsed} collapsedHeight={COLLAPSED_HEIGHT} class={className} style={style}>
-    <div class="flex gap-2 flex-wrap">
-        {tags.map(t => (
-            <ButtonTag href={getTagUrl(t.name)} label={`View all posts with the ${t.name.trim()} tag`}>
-                {t.name.trim()}
-            </ButtonTag>
-        ))}
-    </div>
+
+<WidgetLayout name={i18n(I18nKey.tags)} id="tags" badge={String(tags.length)} class={className} style={style}>
+	<div class="flex flex-col gap-1 px-2">
+		{
+			sortedLetters.map((letter) => (
+				<tag-group data-letter={letter}>
+					<button class="group-header w-full h-9 rounded-lg hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition-all flex items-center justify-between px-2">
+						<div class="flex items-center gap-2">
+							<span class="font-bold text-base text-[var(--primary)] w-6 text-left">
+								{letter}
+							</span>
+							<div class="px-2 h-5 min-w-[1.25rem] rounded-md text-xs font-bold text-[var(--btn-content)] dark:text-[var(--deep-text)] bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)] flex items-center justify-center">
+								{groupedTags.get(letter)!.length}
+							</div>
+						</div>
+						<Icon
+							name="material-symbols:expand-more"
+							class="text-[1.25rem] text-[var(--btn-content)] transition-transform duration-300 expand-icon"
+						/>
+					</button>
+					<div class="group-content overflow-hidden transition-all duration-1000 ease-in-out max-h-0">
+						<div class="flex gap-2 flex-wrap px-2 py-2">
+							{groupedTags
+								.get(letter)!
+								.map((t) => (
+									<ButtonTag
+										href={getTagUrl(t.name)}
+										label={`View all posts with the ${t.name.trim()} tag`}
+									>
+										{t.name.trim()}
+									</ButtonTag>
+								))}
+						</div>
+					</div>
+				</tag-group>
+			))
+		}
+	</div>
 </WidgetLayout>
+
+<style>
+	.group-content.expanded {
+		max-height: 500px;
+	}
+</style>
+
+<script>
+	class TagGroup extends HTMLElement {
+		constructor() {
+			super();
+			const btn = this.querySelector(".group-header");
+			const content = this.querySelector(".group-content");
+			const icon = this.querySelector(".expand-icon");
+
+			btn!.addEventListener("click", () => {
+				const isExpanded = content!.classList.contains("expanded");
+				if (isExpanded) {
+					content!.classList.remove("expanded");
+					icon!.classList.remove("rotate-180");
+				} else {
+					content!.classList.add("expanded");
+					icon!.classList.add("rotate-180");
+				}
+			});
+		}
+	}
+
+	if (!customElements.get("tag-group")) {
+		customElements.define("tag-group", TagGroup);
+	}
+</script>

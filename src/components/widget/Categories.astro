@@ -6,9 +6,10 @@ import ButtonLink from "../control/ButtonLink.astro";
 import WidgetLayout from "./WidgetLayout.astro";
 
 const categories = await getCategoryList();
+const totalCount = categories.reduce((sum, c) => sum + c.count, 0);
 
 const COLLAPSED_HEIGHT = "7.5rem";
-const COLLAPSE_THRESHOLD = 5;
+const COLLAPSE_THRESHOLD = 6;
 
 const isCollapsed = categories.length >= COLLAPSE_THRESHOLD;
 
@@ -20,7 +21,7 @@ const className = Astro.props.class;
 const style = Astro.props.style;
 ---
 
-<WidgetLayout name={i18n(I18nKey.categories)} id="categories" isCollapsed={isCollapsed} collapsedHeight={COLLAPSED_HEIGHT}
+<WidgetLayout name={i18n(I18nKey.categories)} id="categories" badge={String(totalCount)} isCollapsed={isCollapsed} collapsedHeight={COLLAPSED_HEIGHT}
                 class={className} style={style}
 >
     {categories.map((c) =>
