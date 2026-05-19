@@ -1,0 +1,11 @@
+[[redirects]]
+  from = "/MDM-blog/*"
+  to = "/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/MDM-blog"
+  to = "/"
+  status = 200
+  force = true
