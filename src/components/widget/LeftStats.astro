@@ -1,0 +1,150 @@
+---
+import { siteConfig } from "../../config";
+import { getTotalReadingStats } from "../../utils/content-utils";
+
+// 静态部分：build 时由模块级 Promise 缓存聚合一次
+const { totalWords, totalMinutes } = await getTotalReadingStats();
+
+// 动态部分：仅保留 ISO 日期，客户端 JS 实时计算并按分钟刷新
+const birthdayISO = siteConfig.leftStats.birthday;
+const codingStartISO = siteConfig.leftStats.codingStart;
+
+// 列表项 label 中的 <span> 标签由客户端 JS 注入文本；set:html 渲染，来源受信任
+const items: { label: string }[] = [
+	{ label: `本站累计输出内容已达 ${totalWords.toLocaleString()} 字数` },
+	{
+		label: `浏览本站所有文章所需时长大约为 ${totalMinutes.toLocaleString()} 分钟`,
+	},
+	{
+		label: `博主玩地球 online 已经 <span id="days-alive" data-birthday="${birthdayISO}">…</span> 天了`,
+	},
+	{
+		label: `博主的编程生涯已经 <span id="days-coding" data-coding-start="${codingStartISO}">…</span> 天了`,
+	},
+];
+---
+
+<div class="left-stats-card">
+    <div class="left-stats-title">站点相关数据</div>
+    <div class="left-stats-list">
+        {items.map((item, idx) => (
+            <div class="left-stats-item">
+                <div class="left-stats-badge">{idx + 1}</div>
+                <div class="left-stats-label" set:html={item.label}></div>
+            </div>
+        ))}
+    </div>
+</div>
+
+<script>
+    // 绑定单个天数 span：实时计算 + 每分钟刷新
+    // 每次 tick 重新查询 DOM，避免 Swup 替换容器后引用失效
+    function bindDaysSpan(id: string, isoDate: string) {
+        const start = new Date(isoDate).getTime();
+        const update = () => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = Math.floor((Date.now() - start) / 86_400_000).toLocaleString();
+        };
+        update();
+        setInterval(update, 60_000); // 每分钟刷新
+    }
+
+    function initLeftStats() {
+        const aliveEl = document.getElementById("days-alive");
+        if (aliveEl?.dataset.birthday) {
+            bindDaysSpan("days-alive", aliveEl.dataset.birthday);
+        }
+        const codingEl = document.getElementById("days-coding");
+        if (codingEl?.dataset.codingStart) {
+            bindDaysSpan("days-coding", codingEl.dataset.codingStart);
+        }
+    }
+
+    // 首次加载
+    initLeftStats();
+
+    // Swup 页面切换后重新绑定（Astro 客户端脚本只会执行一次，但 Swup 会保留 #left-stats DOM）
+    // 这里做防御性处理：如果未来需要把 #left-stats 加入 swup 容器，初始化逻辑也能复用
+    if (typeof window !== "undefined") {
+        const swup = (window as any).swup;
+        if (swup?.hooks?.on) {
+            swup.hooks.on("page:view", initLeftStats);
+        }
+    }
+</script>
+
+<style>
+    /* 与右侧 TOC 视觉完全一致：徽章圆角、悬停态、间距 */
+    .left-stats-card {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    .left-stats-title {
+        font-weight: 700;
+        font-size: 1.125rem;
+        color: oklch(0.205 0 0); /* neutral-900 light */
+        margin-left: 2rem;
+        margin-top: 0.75rem;
+        margin-bottom: 0.5rem;
+        position: relative;
+    }
+    :global(.dark) .left-stats-title {
+        color: oklch(0.985 0 0); /* neutral-100 dark */
+    }
+    .left-stats-title::before {
+        content: "";
+        position: absolute;
+        left: -1rem;
+        top: 5.5px;
+        width: 0.25rem;
+        height: 1rem;
+        border-radius: 0.375rem;
+        background: var(--primary);
+    }
+    .left-stats-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    .left-stats-item {
+        padding: 0.5rem 0.5rem;
+        display: flex;
+        gap: 0.5rem;
+        position: relative;
+        transition: all 0.2s;
+        width: 100%;
+        min-height: 2.25rem;
+        border-radius: 0.75rem;
+    }
+    .left-stats-item:hover {
+        background: var(--toc-btn-hover);
+    }
+    .left-stats-item:active {
+        background: var(--toc-btn-active);
+    }
+    .left-stats-badge {
+        transition: all 0.2s;
+        width: 1.25rem;
+        height: 1.25rem;
+        flex-shrink: 0;
+        border-radius: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--toc-badge-bg);
+        color: var(--btn-content);
+    }
+    .left-stats-label {
+        transition: all 0.2s;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        color: rgba(0, 0, 0, 0.5);
+    }
+    :global(.dark) .left-stats-label {
+        color: rgba(255, 255, 255, 0.5);
+    }
+</style>

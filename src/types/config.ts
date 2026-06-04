@@ -34,6 +34,11 @@ export type SiteConfig = {
 		enable: boolean;
 		depth: 1 | 2 | 3;
 	};
+	leftStats: {
+		enable: boolean;
+		birthday: string; // ISO 字符串：YYYY-MM-DD
+		codingStart: string; // ISO 字符串：YYYY-MM-DD
+	};
 
 	favicon: Favicon[];
 };

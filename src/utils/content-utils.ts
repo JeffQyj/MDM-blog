@@ -2,6 +2,7 @@ import { type CollectionEntry, getCollection } from "astro:content";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import { getCategoryUrl } from "@utils/url-utils.ts";
+import getReadingTime from "reading-time";
 
 // // Retrieve posts and sort them by publication date
 async function getRawSortedPosts() {
@@ -111,4 +112,47 @@ export async function getCategoryList(): Promise<Category[]> {
 		});
 	}
 	return ret;
+}
+
+// 去除 Markdown 标记，仅保留可读文本供 reading-time 统计
+function stripMarkdown(md: string): string {
+	return (md || "")
+		.replace(/```[\s\S]*?```/g, " ") // 代码块
+		.replace(/`[^`]*`/g, " ") // 行内代码
+		.replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1") // 链接 / 图片
+		.replace(/[#>*_~|-]/g, " ") // Markdown 语法字符
+		.replace(/\s+/g, " ")
+		.trim();
+}
+
+// 模块级 Promise 缓存：整个 build 进程内只计算一次
+let cachedTotalStats: Promise<{
+	totalWords: number;
+	totalMinutes: number;
+}> | null = null;
+
+// 聚合全站文章的总字数与总阅读时长（分钟）
+// 与 remark-reading-time.mjs 保持相同的 reading-time 库与口径，结果一致
+export function getTotalReadingStats(): Promise<{
+	totalWords: number;
+	totalMinutes: number;
+}> {
+	if (cachedTotalStats) return cachedTotalStats;
+
+	cachedTotalStats = (async () => {
+		const allPosts = await getCollection("posts", ({ data }) => {
+			return import.meta.env.PROD ? data.draft !== true : true;
+		});
+		let totalWords = 0;
+		let totalMinutes = 0;
+		for (const p of allPosts) {
+			const text = stripMarkdown(p.body || "");
+			const rt = getReadingTime(text);
+			totalWords += rt.words;
+			totalMinutes += Math.max(1, Math.round(rt.minutes));
+		}
+		return { totalWords, totalMinutes };
+	})();
+
+	return cachedTotalStats;
 }
