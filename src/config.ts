@@ -55,7 +55,7 @@ export const navBarConfig: NavBarConfig = {
 export const profileConfig: ProfileConfig = {
 	avatar: "assets/images/HDR.jpg",
 	name: "JEFF",
-	bio: "这里是我的专属短剧片场🎬。不定期更新生活随笔、走心感悟与成长碎记。欢迎光临，一起收集平凡日子里的闪光瞬间。",
+	bio: "这里是我的专属畅想天地。不定期更新个人杂谈、成长碎记与项目实录。欢迎你来参观我的世界，一起探索新的可能。",
 	links: [
 		{
 			name: "GitHub",
