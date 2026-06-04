@@ -4,6 +4,14 @@
 
 MDM-blog 是一个基于 Astro 5 的个人技术博客，采用 SSG（Static Site Generation）模式。博客以中文内容为主，记录作者从 2022 年开始的编程学习历程，涵盖编程技术学习笔记、个人成长感悟、项目实战经验等内容。站点支持多语言国际化、静态搜索和深色/浅色主题切换。
 
+## Quick Start
+
+1. 阅读 [Content Authoring Rules](#content-authoring-rules) 了解文章规范入口
+2. 查看 [Tech Stack](#tech-stack) 了解项目技术栈
+3. 参考 [Build & Run](#build--run) 启动开发环境
+4. 撰写文章前必读 `.trae/rules/article-workflow.md`，按工作流分阶段执行
+5. 不确定写法时查阅 `.trae/rules/article-examples.md` 的正反例对照
+
 ## Tech Stack
 
 | 技术           | 版本      | 用途          |
@@ -100,14 +108,6 @@ src/
 - 样式变量统一在 `src/styles/` 目录下管理
 - 组件开发遵循现有组件的命名和结构模式
 
-## Content Authoring Rules
-
-文章创作风格、约束条件、工作流程的统一规范存放于 `.trae/rules/` 目录，作为唯一权威来源。修改规则后需同步检查本文件是否产生重复内容。
-
-- [文章创作风格](file:///e:/A_One_Year_Learning/Project/Secondary_Dev_Road/MDM-blog/.trae/rules/article-style.md) — 内容风格、文章结构、admonition 用法、独立项目系列风格
-- [文章约束条件](file:///e:/A_One_Year_Learning/Project/Secondary_Dev_Road/MDM-blog/.trae/rules/article-constraints.md) — frontmatter、命名、分类、标签、日期、推送、commit 规范
-- [文章工作流](file:///e:/A_One_Year_Learning/Project/Secondary_Dev_Road/MDM-blog/.trae/rules/article-workflow.md) — 主题确认 → 大纲优化 → 创作 → 校验 的分阶段规范
-
 ## Key Entry Points
 
 | 文件                      | 用途                            |
@@ -126,10 +126,15 @@ src/
 - **部署平台**：配置了 Vercel 部署（`vercel.json`）
 - **静态搜索**：构建时生成 Pagefind 索引，支持站内全文搜索
 - **代码高亮**：使用 astro-expressive-code 增强代码块显示
+- **已配置 Skill**：`article-writing`（撰写文章时调用）、`brainstorming`（创作前需求澄清）
 
 ## Important Paths
 
-- **项目规则**：`.trae/rules/article-*.md`（3 个文件：style / constraints / workflow）
+- **规则索引**：[`.trae/rules/README.md`](file:///e:/A_One_Year_Learning/Project/Secondary_Dev_Road/MDM-blog/.trae/rules/README.md)
+- **工作流规范**：[`.trae/rules/article-workflow.md`](file:///e:/A_One_Year_Learning/Project/Secondary_Dev_Road/MDM-blog/.trae/rules/article-workflow.md)
+- **约束规范**：[`.trae/rules/article-constraints.md`](file:///e:/A_One_Year_Learning/Project/Secondary_Dev_Road/MDM-blog/.trae/rules/article-constraints.md)
+- **风格规范**：[`.trae/rules/article-style.md`](file:///e:/A_One_Year_Learning/Project/Secondary_Dev_Road/MDM-blog/.trae/rules/article-style.md)
+- **正反例库**：[`.trae/rules/article-examples.md`](file:///e:/A_One_Year_Learning/Project/Secondary_Dev_Road/MDM-blog/.trae/rules/article-examples.md)
 - **博客文章**：`src/content/posts/**/*.md`（90+ 篇文章）
 - **站点配置**：`src/config.ts`
 - **样式变量**：`src/styles/variables.styl`
