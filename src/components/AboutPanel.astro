@@ -1,0 +1,566 @@
+---
+import { Icon } from "astro-icon/components";
+import type { CollectionEntry } from "astro:content";
+import MarkdownIt from "markdown-it";
+import sanitizeHtml from "sanitize-html";
+
+interface Props {
+	entry: CollectionEntry<"spec">;
+}
+
+const { entry } = Astro.props;
+
+interface QA {
+	question: string;
+	answerHtml: string; // 已渲染的 HTML
+}
+
+const md = new MarkdownIt({
+	html: true,
+	linkify: true,
+	typographer: true,
+	breaks: false,
+});
+
+/**
+ * 渲染并清洗 Markdown 片段为 HTML 字符串。
+ * - 允许所有 Tailwind Typography 所需标签
+ * - 表格/列表/代码块等结构保留
+ * - 链接加 target=_blank 与 rel=noopener
+ */
+function renderAnswer(markdown: string): string {
+	const raw = md.render(markdown);
+	return sanitizeHtml(raw, {
+		allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+			"img",
+			"h1",
+			"h2",
+			"h3",
+			"h4",
+			"h5",
+			"h6",
+		]),
+		allowedAttributes: {
+			...sanitizeHtml.defaults.allowedAttributes,
+			img: ["src", "alt", "title", "width", "height"],
+			a: ["href", "name", "target", "rel"],
+			th: ["align", "scope"],
+			td: ["align"],
+		},
+		transformTags: {
+			a: (tagName, attribs) => ({
+				tagName,
+				attribs: {
+					...attribs,
+					target: "_blank",
+					rel: "noopener noreferrer",
+				},
+			}),
+		},
+	});
+}
+
+interface ParsedBlock {
+	type: string;
+	content: string;
+}
+
+/**
+ * 解析 about.md 的正文：
+ * 1) 按出现顺序提取全部 admonition 块（:::tip / :::note）；
+ * 2) 两两配对为 Q&A（tip=问句，note=答句）；
+ * 3) 配对失败或类型不匹配时跳过并打印警告，绝不抛错影响页面。
+ */
+function parseQAPairs(body: string): QA[] {
+	const re = /^:::(tip|note)\r?\n([\s\S]*?)\r?\n:::/gm;
+	const blocks: ParsedBlock[] = [];
+	let m: RegExpExecArray | null;
+	while ((m = re.exec(body)) !== null) {
+		blocks.push({ type: m[1], content: m[2] });
+	}
+
+	const qaList: QA[] = [];
+	for (let i = 0; i + 1 < blocks.length; i += 2) {
+		const a = blocks[i];
+		const b = blocks[i + 1];
+		if (a.type === "tip" && b.type === "note") {
+			// 剥离开头的 "Q:" 前缀（保持与原 admonition 内容一致）
+			const question = a.content.replace(/^Q:\s*/, "").trim();
+			qaList.push({
+				question,
+				answerHtml: renderAnswer(b.content.trim()),
+			});
+		} else {
+			console.warn(
+				`[AboutPanel] 非配对 admonition 已被跳过：tip/note 顺序异常 @${i}`,
+			);
+		}
+	}
+	return qaList;
+}
+
+/**
+ * 提取最后一个 *** 之后的「寄语」文本，并去掉斜体的 * 包裹。
+ * 同时清理 markdown 源里的反斜杠转义（如 \@ → @），避免原文照搬。
+ * 若不存在则返回 null，由模板控制是否渲染 footer。
+ */
+function extractFooter(body: string): string | null {
+	const idx = body.lastIndexOf("\n***\n");
+	if (idx === -1) return null;
+	const after = body.slice(idx + 5).trim();
+	if (!after) return null;
+	// 1) 去掉首尾成对星号（Markdown 斜体）
+	// 2) 把所有 markdown 转义符 \@、\*、\_、\`、\# 等还原成原字符
+	const cleaned = after
+		.replace(/^\*+|\*+$/g, "")
+		.replace(/\\([@\\*_`[\]()~>#+=|{}.\-!])/g, "$1")
+		.trim();
+	return cleaned || null;
+}
+
+const qaList = parseQAPairs(entry.body);
+const footerText = extractFooter(entry.body);
+---
+
+<section class="about-panel">
+    <div class="about-panel__list">
+        {qaList.length === 0 && (
+            <div class="about-panel__empty">
+                <p>关于页内容为空或格式异常，请检查 <code>src/content/spec/about.md</code>。</p>
+            </div>
+        )}
+
+        {qaList.map((qa, i) => {
+            const num = String(i + 1).padStart(2, "0");
+            return (
+                <article
+                    class="qa-card"
+                    style={`animation-delay: calc(var(--content-delay) + ${i * 80}ms);`}
+                >
+                    <span class="qa-card__bar" aria-hidden="true"></span>
+
+                    <header class="qa-card__q">
+                        <div class="qa-card__q-top">
+                            <span class="qa-card__index">
+                                <span class="qa-card__index-q">Q</span>
+                                <span class="qa-card__index-num">{num}</span>
+                            </span>
+                            <span class="qa-card__q-label">QUESTION</span>
+                        </div>
+                        <h3 class="qa-card__q-text">{qa.question}</h3>
+                    </header>
+
+                    <div class="qa-card__a">
+                        <div class="qa-card__a-label">A · ANSWER</div>
+                        <div
+                            class="qa-card__a-body prose dark:prose-invert prose-base max-w-none custom-md"
+                            set:html={qa.answerHtml}
+                        />
+                    </div>
+                </article>
+            );
+        })}
+    </div>
+
+    {footerText && (
+        <footer class="about-panel__foot">
+            <span class="about-panel__foot-bar" aria-hidden="true"></span>
+            <Icon
+                name="material-symbols:alternate-email-rounded"
+                class="text-[1.2em] shrink-0"
+            />
+            <span class="about-panel__foot-text">{footerText}</span>
+        </footer>
+    )}
+</section>
+
+<style is:global>
+    /* 全局定义衬线字体，便于组件内复用 */
+    :root {
+        --serif:
+            "Source Han Serif SC", "Noto Serif SC", "Songti SC",
+            "STSong", "SimSun", "Georgia", serif;
+    }
+</style>
+
+<style>
+    /* ============================================
+       面板容器
+       ============================================ */
+    .about-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 1.75rem;
+    }
+
+    .about-panel__list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .about-panel__empty {
+        padding: 1.5rem 1.75rem;
+        border-radius: var(--radius-large);
+        background: var(--btn-regular-bg);
+        color: oklch(0.5 0.02 var(--hue));
+        font-size: 0.9375rem;
+    }
+
+    .about-panel__empty code {
+        font-family: "JetBrains Mono Variable", ui-monospace, monospace;
+        background: var(--card-bg);
+        padding: 0.1rem 0.35rem;
+        border-radius: 4px;
+        color: var(--primary);
+    }
+
+    /* ============================================
+       入场动画
+       ============================================ */
+    @keyframes qaFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .qa-card {
+        animation: qaFadeIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    /* ============================================
+       卡片核心
+       ============================================ */
+    .qa-card {
+        position: relative;
+        background: var(--card-bg);
+        border: 1px solid oklch(from var(--primary) l c h / 0.15);
+        border-radius: var(--radius-large);
+        transition:
+            transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+            box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+            border-color 0.45s ease;
+        overflow: hidden;
+    }
+
+    /* 左侧 6px 彩条（hover 加粗到 8px） */
+    .qa-card__bar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        background: linear-gradient(
+            180deg,
+            oklch(0.75 0.16 var(--hue)) 0%,
+            oklch(0.62 0.16 calc(var(--hue) + 30)) 50%,
+            oklch(0.75 0.16 var(--hue)) 100%
+        );
+        transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .qa-card:hover {
+        transform: translateY(-4px);
+        box-shadow:
+            0 1px 0 0 oklch(0.95 0.03 var(--hue)) inset,
+            0 16px 40px -12px oklch(0.4 0.08 var(--hue) / 0.22);
+        border-color: oklch(from var(--primary) l c h / 0.35);
+    }
+
+    .qa-card:hover .qa-card__bar {
+        width: 8px;
+    }
+
+    :root.dark .qa-card {
+        border-color: oklch(from var(--primary) l c h / 0.22);
+        box-shadow: 0 1px 0 0 oklch(0.3 0.02 var(--hue)) inset;
+    }
+
+    :root.dark .qa-card:hover {
+        box-shadow:
+            0 1px 0 0 oklch(0.3 0.02 var(--hue)) inset,
+            0 16px 40px -12px rgb(0 0 0 / 0.6);
+    }
+
+    /* ============================================
+       问句区（Q）：突出字号 + 序号角标
+       ============================================ */
+    .qa-card__q {
+        position: relative;
+        padding: 1.75rem 2rem 1.5rem 2.5rem;
+        background: linear-gradient(
+            180deg,
+            oklch(from var(--primary) l c h / 0.06) 0%,
+            oklch(from var(--primary) l c h / 0.02) 100%
+        );
+        border-bottom: 1px solid oklch(from var(--primary) l c h / 0.15);
+    }
+
+    :root.dark .qa-card__q {
+        background: linear-gradient(
+            180deg,
+            oklch(from var(--primary) l c h / 0.10) 0%,
+            oklch(from var(--primary) l c h / 0.03) 100%
+        );
+    }
+
+    .qa-card__q-top {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.625rem;
+    }
+
+    /* 序号角标：「Q」+「01」拼合 */
+    .qa-card__index {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 0.125rem;
+        padding: 0.25rem 0.625rem;
+        background: var(--primary);
+        color: white;
+        border-radius: 0.375rem;
+        font-family: "JetBrains Mono Variable", ui-monospace, monospace;
+        font-weight: 800;
+        line-height: 1;
+        box-shadow: 0 2px 8px -2px oklch(from var(--primary) l c h / 0.5);
+    }
+
+    :root.dark .qa-card__index {
+        color: oklch(0.18 0.02 var(--hue));
+    }
+
+    .qa-card__index-q {
+        font-size: 0.75rem;
+        opacity: 0.85;
+    }
+
+    .qa-card__index-num {
+        font-size: 0.9375rem;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.02em;
+    }
+
+    /* QUESTION 标签 */
+    .qa-card__q-label {
+        font-family: "JetBrains Mono Variable", ui-monospace, monospace;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        color: var(--primary);
+        opacity: 0.7;
+    }
+
+    /* 问句本体：大号衬线 + 强粗细 */
+    .qa-card__q-text {
+        margin: 0;
+        font-family: var(--serif);
+        font-size: 1.375rem;
+        font-weight: 700;
+        line-height: 1.5;
+        letter-spacing: 0.01em;
+        color: oklch(0.22 0.03 var(--hue));
+    }
+
+    :root.dark .qa-card__q-text {
+        color: oklch(0.94 0.01 var(--hue));
+    }
+
+    /* ============================================
+       答案区（A）：干净排版区
+       ============================================ */
+    .qa-card__a {
+        position: relative;
+        padding: 1.5rem 2rem 1.75rem 2.5rem;
+    }
+
+    .qa-card__a-label {
+        display: inline-block;
+        margin-bottom: 0.875rem;
+        padding: 0.2rem 0.5rem;
+        background: var(--btn-regular-bg);
+        color: var(--primary);
+        font-family: "JetBrains Mono Variable", ui-monospace, monospace;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        border-radius: 4px;
+    }
+
+    :root.dark .qa-card__a-label {
+        background: oklch(0.28 0.02 var(--hue));
+    }
+
+    /* ============================================
+       答案区 Markdown 元素定制（prose 已提供基础排版）
+       ============================================ */
+    .qa-card__a-body {
+        color: oklch(0.32 0.01 var(--hue));
+        line-height: 1.85;
+        font-size: 1rem; /* 16px，比 prose-base 略大更易读 */
+        /* 修复 CJK 换行：「下一个土木」 不应在中间断开 */
+        text-wrap: pretty;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+    }
+
+    :root.dark .qa-card__a-body {
+        color: oklch(0.78 0.01 var(--hue));
+    }
+
+    .qa-card__a-body :global(.prose) {
+        font-size: 1rem;
+        line-height: 1.85;
+        text-wrap: pretty;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+    }
+
+    .qa-card__a-body :global(p) {
+        margin: 0.625rem 0;
+    }
+
+    .qa-card__a-body :global(p:first-child) {
+        margin-top: 0;
+    }
+
+    .qa-card__a-body :global(p:last-child) {
+        margin-bottom: 0;
+    }
+
+    .qa-card__a-body :global(strong) {
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    .qa-card__a-body :global(ul),
+    .qa-card__a-body :global(ol) {
+        margin: 0.625rem 0;
+        padding-left: 1.5rem;
+    }
+
+    .qa-card__a-body :global(li) {
+        margin: 0.25rem 0;
+    }
+
+    /* 表格：定制成现代数据表样式 */
+    .qa-card__a-body :global(table) {
+        width: 100%;
+        margin: 0.875rem 0;
+        font-size: 0.875rem;
+        border-collapse: separate;
+        border-spacing: 0;
+        border: 1px solid oklch(from var(--primary) l c h / 0.18);
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+
+    .qa-card__a-body :global(thead) {
+        background: oklch(from var(--primary) l c h / 0.08);
+    }
+
+    :root.dark .qa-card__a-body :global(thead) {
+        background: oklch(from var(--primary) l c h / 0.15);
+    }
+
+    .qa-card__a-body :global(th) {
+        padding: 0.625rem 0.875rem;
+        text-align: left;
+        font-weight: 700;
+        color: var(--primary);
+        border-bottom: 1px solid oklch(from var(--primary) l c h / 0.2);
+        font-size: 0.8125rem;
+    }
+
+    .qa-card__a-body :global(td) {
+        padding: 0.625rem 0.875rem;
+        border-bottom: 1px solid var(--line-divider);
+        vertical-align: top;
+    }
+
+    .qa-card__a-body :global(tbody tr:last-child td) {
+        border-bottom: none;
+    }
+
+    .qa-card__a-body :global(tbody tr:hover) {
+        background: oklch(from var(--primary) l c h / 0.03);
+    }
+
+    :root.dark .qa-card__a-body :global(tbody tr:hover) {
+        background: oklch(from var(--primary) l c h / 0.06);
+    }
+
+    /* ============================================
+       结尾寄语
+       ============================================ */
+    .about-panel__foot {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1.125rem 1.5rem 1.125rem 2rem;
+        border-radius: var(--radius-large);
+        background: linear-gradient(
+            135deg,
+            oklch(from var(--primary) l c h / 0.08) 0%,
+            oklch(from var(--primary) l c h / 0.03) 100%
+        );
+        color: oklch(0.4 0.04 var(--hue));
+        font-size: 0.9375rem;
+        border: 1px solid oklch(from var(--primary) l c h / 0.15);
+    }
+
+    :root.dark .about-panel__foot {
+        color: oklch(0.78 0.02 var(--hue));
+    }
+
+    .about-panel__foot-bar {
+        position: absolute;
+        left: 0;
+        top: 1rem;
+        bottom: 1rem;
+        width: 3px;
+        background: var(--primary);
+        border-radius: 0 2px 2px 0;
+    }
+
+    .about-panel__foot-text {
+        line-height: 1.6;
+    }
+
+    /* ============================================
+       移动端
+       ============================================ */
+    @media (max-width: 640px) {
+        .qa-card__q {
+            padding: 1.375rem 1.25rem 1.25rem 1.875rem;
+        }
+
+        .qa-card__q-text {
+            font-size: 1.125rem;
+        }
+
+        .qa-card__a {
+            padding: 1.25rem 1.25rem 1.375rem 1.875rem;
+        }
+
+        .qa-card__a-body :global(table) {
+            font-size: 0.8125rem;
+        }
+
+        .qa-card__a-body :global(th),
+        .qa-card__a-body :global(td) {
+            padding: 0.5rem 0.625rem;
+        }
+
+        .about-panel__foot {
+            padding: 1rem 1.25rem 1rem 1.5rem;
+            font-size: 0.875rem;
+        }
+    }
+</style>
