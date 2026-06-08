@@ -1,0 +1,13 @@
+---
+import FeaturedPanel from "@components/FeaturedPanel.astro";
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { getFeaturedPosts } from "../utils/content-utils";
+
+const featuredPosts = await getFeaturedPosts();
+---
+
+<MainGridLayout title={i18n(I18nKey.featured)}>
+    <FeaturedPanel posts={featuredPosts}></FeaturedPanel>
+</MainGridLayout>

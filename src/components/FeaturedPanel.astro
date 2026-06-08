@@ -1,0 +1,482 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getPostUrlBySlug } from "@utils/url-utils";
+import FeaturedCard from "./FeaturedCard.astro";
+
+interface Props {
+	posts: CollectionEntry<"posts">[];
+}
+
+const { posts } = Astro.props;
+
+// 逐个调用 entry.render()，获取 excerpt 用于卡片摘要展示
+const renderedPosts = await Promise.all(
+	posts.map(async (entry) => {
+		const { remarkPluginFrontmatter } = await entry.render();
+		return { entry, remarkPluginFrontmatter };
+	}),
+);
+
+// Hero 期号：基于当前年月计算（VOL.MM.YYYY 形式）
+const now = new Date();
+const issueVolume = `${String(now.getMonth() + 1).padStart(2, "0")}.${now.getFullYear()}`;
+
+// 最新文章日期作为副信息
+const latestDate = renderedPosts[0]?.entry.data.published;
+const latestDateText = latestDate
+	? `${latestDate.getFullYear()}-${String(latestDate.getMonth() + 1).padStart(2, "0")}-${String(latestDate.getDate()).padStart(2, "0")}`
+	: "";
+---
+
+<div class="featured-page">
+    <!-- ============================================
+         英雄区（Hero）
+         ============================================ -->
+    {posts.length > 0 && (
+        <section class="featured-hero" style={`animation-delay: calc(var(--content-delay) + 0ms);`}>
+            <!-- 装饰几何：右侧大号半透明 ★ + 左下点阵 -->
+            <div class="featured-hero__deco-star" aria-hidden="true">★</div>
+            <div class="featured-hero__deco-dots" aria-hidden="true"></div>
+
+            <div class="featured-hero__inner">
+                <!-- 顶部小帽 -->
+                <div class="featured-hero__eyebrow">
+                    <span class="featured-hero__rule"></span>
+                    <span class="featured-hero__eyebrow-text">EDITOR'S PICK · 主编精选</span>
+                    <span class="featured-hero__rule"></span>
+                </div>
+
+                <!-- 巨型主标题 -->
+                <h1 class="featured-hero__title">
+                    <span class="featured-hero__title-en">Curated</span>
+                    <span class="featured-hero__title-zh">精 选</span>
+                </h1>
+
+                <!-- 副标题 -->
+                <p class="featured-hero__subtitle">
+                    精心挑选的篇章，每一篇都值得驻足
+                </p>
+
+                <!-- 杂志期号信息 -->
+                <div class="featured-hero__meta">
+                    <span class="featured-hero__meta-item">
+                        <span class="featured-hero__meta-label">VOL</span>
+                        <span class="featured-hero__meta-value">{issueVolume}</span>
+                    </span>
+                    <span class="featured-hero__meta-dot" aria-hidden="true">·</span>
+                    <span class="featured-hero__meta-item">
+                        <span class="featured-hero__meta-label">LATEST</span>
+                        <span class="featured-hero__meta-value">{latestDateText}</span>
+                    </span>
+                    <span class="featured-hero__meta-dot" aria-hidden="true">·</span>
+                    <span class="featured-hero__meta-item">
+                        <span class="featured-hero__meta-label">ARTICLES</span>
+                        <span class="featured-hero__meta-value">{posts.length}</span>
+                    </span>
+                </div>
+            </div>
+        </section>
+    )}
+
+    <!-- ============================================
+         空状态
+         ============================================ -->
+    {posts.length === 0 && (
+        <div class="featured-empty">
+            <p class="featured-empty__text">
+                暂无精选文章，去给想要展示的文章加上 <code>featured: true</code> 吧。
+            </p>
+        </div>
+    )}
+
+    <!-- ============================================
+         第一篇特写卡片
+         ============================================ -->
+    {renderedPosts[0] && (
+        <section class="featured-section">
+            <FeaturedCard
+                entry={renderedPosts[0].entry}
+                title={renderedPosts[0].entry.data.title}
+                tags={renderedPosts[0].entry.data.tags}
+                category={renderedPosts[0].entry.data.category}
+                published={renderedPosts[0].entry.data.published}
+                url={getPostUrlBySlug(renderedPosts[0].entry.slug)}
+                description={renderedPosts[0].entry.data.description}
+                excerpt={renderedPosts[0].remarkPluginFrontmatter.excerpt}
+                index={1}
+                variant="feature"
+                style={`animation-delay: calc(var(--content-delay) + 80ms);`}
+            />
+        </section>
+    )}
+
+    <!-- ============================================
+         后续网格卡片
+         ============================================ -->
+    {renderedPosts.length > 1 && (
+        <section class="featured-section">
+            <div class="featured-section__divider" aria-hidden="true">
+                <span class="featured-section__divider-text">MORE PICKS · 更多精选</span>
+            </div>
+            <div class="featured-grid">
+                {renderedPosts.slice(1).map(({ entry, remarkPluginFrontmatter }, i) => (
+                    <FeaturedCard
+                        entry={entry}
+                        title={entry.data.title}
+                        tags={entry.data.tags}
+                        category={entry.data.category}
+                        published={entry.data.published}
+                        url={getPostUrlBySlug(entry.slug)}
+                        description={entry.data.description}
+                        excerpt={remarkPluginFrontmatter.excerpt}
+                        index={i + 2}
+                        variant="compact"
+                        style={`animation-delay: calc(var(--content-delay) + ${(i + 2) * 80}ms);`}
+                    />
+                ))}
+            </div>
+        </section>
+    )}
+</div>
+
+<style>
+    .featured-page {
+        /* 衬线字体（与卡片保持一致） */
+        --serif:
+            "Source Han Serif SC", "Noto Serif SC", "Songti SC",
+            "STSong", "SimSun", "Georgia", serif;
+        --accent: var(--primary);
+
+        display: flex;
+        flex-direction: column;
+        gap: 1.75rem;
+    }
+
+    /* ============================================
+       Hero 英雄区
+       ============================================ */
+    .featured-hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: var(--radius-large);
+        padding: 3.5rem 2.5rem 2.5rem;
+        background:
+            linear-gradient(
+                135deg,
+                oklch(0.97 0.02 var(--hue)) 0%,
+                oklch(0.94 0.04 calc(var(--hue) + 30)) 60%,
+                oklch(0.96 0.06 calc(var(--hue) + 60)) 100%
+            );
+        box-shadow:
+            inset 0 1px 0 0 oklch(0.99 0.01 var(--hue)),
+            0 1px 2px 0 rgb(0 0 0 / 0.03);
+        animation: heroFadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    :root.dark .featured-hero {
+        background:
+            linear-gradient(
+                135deg,
+                oklch(0.22 0.018 var(--hue)) 0%,
+                oklch(0.26 0.035 calc(var(--hue) + 30)) 60%,
+                oklch(0.30 0.05 calc(var(--hue) + 60)) 100%
+            );
+        box-shadow:
+            inset 0 1px 0 0 oklch(0.32 0.02 var(--hue)),
+            0 4px 20px -4px rgb(0 0 0 / 0.4);
+    }
+
+    @keyframes heroFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* 装饰大星 */
+    .featured-hero__deco-star {
+        position: absolute;
+        top: -2.5rem;
+        right: 1.5rem;
+        font-size: 22rem;
+        line-height: 1;
+        color: var(--accent);
+        opacity: 0.06;
+        font-weight: 900;
+        transform: rotate(-15deg);
+        pointer-events: none;
+        font-family: var(--serif);
+    }
+
+    /* 装饰点阵 */
+    .featured-hero__deco-dots {
+        position: absolute;
+        bottom: 1.5rem;
+        left: 1.5rem;
+        width: 6rem;
+        height: 3rem;
+        background-image: radial-gradient(
+            circle,
+            var(--accent) 1.5px,
+            transparent 1.5px
+        );
+        background-size: 14px 14px;
+        opacity: 0.25;
+        pointer-events: none;
+    }
+
+    .featured-hero__inner {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    /* 顶部小帽 EDITOR'S PICK */
+    .featured-hero__eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.875rem;
+        font-family: var(--serif);
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        color: oklch(0.45 0.06 var(--hue));
+    }
+
+    :root.dark .featured-hero__eyebrow {
+        color: oklch(0.7 0.05 var(--hue));
+    }
+
+    .featured-hero__rule {
+        display: inline-block;
+        width: 2.5rem;
+        height: 1px;
+        background: currentColor;
+        opacity: 0.6;
+    }
+
+    .featured-hero__eyebrow-text {
+        white-space: nowrap;
+    }
+
+    /* 主标题 */
+    .featured-hero__title {
+        margin: 0.5rem 0 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+        font-family: var(--serif);
+        line-height: 1;
+    }
+
+    .featured-hero__title-en {
+        font-size: 0.875rem;
+        font-style: italic;
+        font-weight: 500;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--accent);
+        opacity: 0.7;
+    }
+
+    .featured-hero__title-zh {
+        font-size: clamp(3rem, 1.5rem + 6vw, 6rem);
+        font-weight: 900;
+        letter-spacing: 0.1em;
+        color: oklch(0.22 0.04 var(--hue));
+        background: linear-gradient(
+            180deg,
+            oklch(0.22 0.04 var(--hue)) 0%,
+            oklch(0.45 0.1 var(--hue)) 100%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    :root.dark .featured-hero__title-zh {
+        background: linear-gradient(
+            180deg,
+            oklch(0.95 0.02 var(--hue)) 0%,
+            oklch(0.7 0.1 var(--hue)) 100%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* 副标题 */
+    .featured-hero__subtitle {
+        margin: 0;
+        font-size: 0.95rem;
+        color: oklch(0.5 0.02 var(--hue));
+        font-weight: 400;
+        letter-spacing: 0.05em;
+    }
+
+    :root.dark .featured-hero__subtitle {
+        color: oklch(0.7 0.015 var(--hue));
+    }
+
+    /* 杂志期号元信息 */
+    .featured-hero__meta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.875rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 0.75rem;
+        padding-top: 1.25rem;
+        border-top: 1px dashed oklch(0.5 0.02 var(--hue) / 0.3);
+        font-family: var(--serif);
+    }
+
+    .featured-hero__meta-item {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 0.4rem;
+    }
+
+    .featured-hero__meta-label {
+        font-size: 0.625rem;
+        font-weight: 600;
+        letter-spacing: 0.15em;
+        color: oklch(0.55 0.02 var(--hue));
+        opacity: 0.7;
+    }
+
+    :root.dark .featured-hero__meta-label {
+        color: oklch(0.7 0.02 var(--hue));
+    }
+
+    .featured-hero__meta-value {
+        font-size: 0.95rem;
+        font-weight: 700;
+        font-feature-settings: "tnum" 1;
+        color: oklch(0.3 0.04 var(--hue));
+        letter-spacing: 0.05em;
+    }
+
+    :root.dark .featured-hero__meta-value {
+        color: oklch(0.85 0.02 var(--hue));
+    }
+
+    .featured-hero__meta-dot {
+        color: oklch(0.6 0.02 var(--hue));
+        opacity: 0.4;
+        font-size: 1.1rem;
+    }
+
+    /* ============================================
+       空状态
+       ============================================ */
+    .featured-empty {
+        text-align: center;
+        padding: 4rem 1rem;
+        color: oklch(0.55 0.02 var(--hue));
+        font-size: 0.95rem;
+    }
+
+    :root.dark .featured-empty {
+        color: oklch(0.7 0.015 var(--hue));
+    }
+
+    .featured-empty__text code {
+        font-family: var(--serif);
+        background: var(--btn-regular-bg);
+        padding: 0.1rem 0.4rem;
+        border-radius: 4px;
+        color: var(--accent);
+    }
+
+    /* ============================================
+       分隔线
+       ============================================ */
+    .featured-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .featured-section__divider {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0 0.5rem;
+    }
+
+    .featured-section__divider::before,
+    .featured-section__divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(
+            90deg,
+            transparent 0%,
+            oklch(0.5 0.02 var(--hue) / 0.3) 50%,
+            transparent 100%
+        );
+    }
+
+    .featured-section__divider-text {
+        font-family: var(--serif);
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        color: oklch(0.55 0.04 var(--hue));
+        white-space: nowrap;
+    }
+
+    /* ============================================
+       网格
+       ============================================ */
+    .featured-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+
+    @media (min-width: 768px) {
+        .featured-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (min-width: 1280px) {
+        .featured-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    /* ============================================
+       移动端适配
+       ============================================ */
+    @media (max-width: 640px) {
+        .featured-hero {
+            padding: 2.5rem 1.25rem 2rem;
+        }
+        .featured-hero__deco-star {
+            font-size: 14rem;
+            top: -1rem;
+        }
+        .featured-hero__deco-dots {
+            width: 4rem;
+            height: 2rem;
+        }
+        .featured-hero__meta {
+            gap: 0.5rem;
+        }
+        .featured-hero__meta-dot {
+            display: none;
+        }
+    }
+</style>

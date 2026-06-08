@@ -47,6 +47,13 @@ export async function getSortedPostsList(): Promise<PostForList[]> {
 
 	return sortedPostsList;
 }
+
+// 获取所有标记为精选（featured: true）的文章，按 published 倒序
+// 返回完整 entry（含 body）供 Astro 组件在构建时调用 entry.render()
+export async function getFeaturedPosts(): Promise<CollectionEntry<"posts">[]> {
+	const allPosts = await getRawSortedPosts();
+	return allPosts.filter((post) => post.data.featured === true);
+}
 export type Tag = {
 	name: string;
 	count: number;
