@@ -112,6 +112,22 @@
     }
 }
 
+/* ============================================
+   性能优化说明（v2.0 · 主页/归档页）
+   ============================================
+   早期版本引入了 glass-panel / glow-blob / glass-chip / card-isolated
+   等工具类，使用了 backdrop-filter: blur()、filter: blur()、
+   多层 radial-gradient、will-change 等对 GPU 较重的特性。
+   新版 PostCard / ArchivePanel 已改为纯静态渐变 + transform，
+   这些工具类已不再被引用，保留仅为兼容旧代码。
+
+   性能建议：
+   - 新代码请避免使用 backdrop-filter / filter: blur
+   - 优先使用 linear-gradient / radial-gradient 静态背景
+   - hover 动画仅使用 transform / opacity / background-color
+   - 不要对 box-shadow 做 transition
+*/
+
 .custom-md img, #post-cover img {
     @apply cursor-zoom-in
 }
