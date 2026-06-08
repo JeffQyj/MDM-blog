@@ -2,6 +2,8 @@
 import type { CollectionEntry } from "astro:content";
 import { Icon } from "astro-icon/components";
 import { getCategoryUrl, getTagUrl } from "@utils/url-utils";
+import I18nKey from "../i18n/i18nKey";
+import { i18n } from "../i18n/translation";
 
 interface Props {
 	entry: CollectionEntry<"posts">;
@@ -16,6 +18,8 @@ interface Props {
 	index: number;
 	/** feature = 整宽特写，compact = 紧凑网格 */
 	variant?: "feature" | "compact";
+	/** 估算阅读时长（分钟），由 remark-reading-time 插件提供 */
+	minutes: number;
 	class?: string;
 	style?: string;
 }
@@ -31,6 +35,7 @@ const {
 	excerpt,
 	index,
 	variant = "compact",
+	minutes = 1,
 	class: className,
 	style,
 } = Astro.props;
@@ -49,8 +54,9 @@ const publishDateText = published
 	? `${published.getFullYear()}-${String(published.getMonth() + 1).padStart(2, "0")}-${String(published.getDate()).padStart(2, "0")}`
 	: "";
 
-// 预计阅读时长：从 excerpt 字数估算（粗略）
-const readMinutes = Math.max(1, Math.round((excerpt?.length ?? 0) / 200));
+// 阅读时长：来自 remark-reading-time 插件，最小 1 分钟
+const readMinutes = Math.max(1, minutes || 0);
+const readMinutesText = `${readMinutes} ${i18n(readMinutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}`;
 
 const isFeature = variant === "feature";
 ---
@@ -116,7 +122,7 @@ const isFeature = variant === "feature";
             <!-- 阅读时长 -->
             <span class="featured-card__meta-item">
                 <Icon name="material-symbols:schedule-rounded" class="text-[0.95em]" />
-                <span>约 {readMinutes} 分钟</span>
+                <span>{readMinutesText}</span>
             </span>
             <!-- tag 斜杠分隔 -->
             {visibleTags.length > 0 && (
