@@ -1,9 +1,5 @@
 # 项目规则索引
 
-> MDM-blog 文章创作规范的统一入口与导航。
->
-> 优先级：参考 · 适用阶段：阅读规则时
-
 ## 文件分工
 
 | 文件                                 | 关注点                     | 优先级 | 适用阶段    |
@@ -31,8 +27,3 @@
 | admonition 怎么用  | [§2 文章结构模板](./article-style.md)                                     |
 | 比喻怎么写           | [§3.1 风格要素](./article-style.md) + [§1 风格正反例](./article-examples.md) |
 
-***
-
-**最后更新**：2026-06-04
-**版本**：v2.0
-**关联文件**：[文章创作风格](./article-style.md) · [文章约束条件](./article-constraints.md) · [文章工作流](./article-workflow.md) · [正反例库](./article-examples.md)

@@ -4,14 +4,6 @@
 
 MDM-blog 是一个基于 Astro 5 的个人技术博客，采用 SSG（Static Site Generation）模式。博客以中文内容为主，记录作者从 2022 年开始的编程学习历程，涵盖编程技术学习笔记、个人成长感悟、项目实战经验等内容。站点支持多语言国际化、静态搜索和深色/浅色主题切换。
 
-## Quick Start
-
-1. 阅读 [Content Authoring Rules](#content-authoring-rules) 了解文章规范入口
-2. 查看 [Tech Stack](#tech-stack) 了解项目技术栈
-3. 参考 [Build & Run](#build--run) 启动开发环境
-4. 撰写文章前必读 `.trae/rules/article-workflow.md`，按工作流分阶段执行
-5. 不确定写法时查阅 `.trae/rules/article-examples.md` 的正反例对照
-
 ## Tech Stack
 
 | 技术           | 版本      | 用途          |
@@ -118,24 +110,4 @@ src/
 | `biome.json`            | 代码质量工具配置                      |
 | `src/content/posts/`    | 博客文章存放目录                      |
 | `scripts/new-post.js`   | 文章生成脚本                        |
-
-## Additional Notes
-
-- **CI/CD**：GitHub Actions 配置了 Biome 检查和构建流程
-- **依赖更新**：使用 Dependabot 自动更新 npm 依赖
-- **部署平台**：配置了 Vercel 部署（`vercel.json`）
-- **静态搜索**：构建时生成 Pagefind 索引，支持站内全文搜索
-- **代码高亮**：使用 astro-expressive-code 增强代码块显示
-- **已配置 Skill**：`article-writing`（撰写文章时调用）、`brainstorming`（创作前需求澄清）
-
-## Important Paths
-
-- **规则索引**：[`.trae/rules/README.md`](file:///e:/A_One_Year_Learning/Project/Secondary_Dev_Road/MDM-blog/.trae/rules/README.md)
-- **工作流规范**：[`.trae/rules/article-workflow.md`](file:///e:/A_One_Year_Learning/Project/Secondary_Dev_Road/MDM-blog/.trae/rules/article-workflow.md)
-- **约束规范**：[`.trae/rules/article-constraints.md`](file:///e:/A_One_Year_Learning/Project/Secondary_Dev_Road/MDM-blog/.trae/rules/article-constraints.md)
-- **风格规范**：[`.trae/rules/article-style.md`](file:///e:/A_One_Year_Learning/Project/Secondary_Dev_Road/MDM-blog/.trae/rules/article-style.md)
-- **正反例库**：[`.trae/rules/article-examples.md`](file:///e:/A_One_Year_Learning/Project/Secondary_Dev_Road/MDM-blog/.trae/rules/article-examples.md)
-- **博客文章**：`src/content/posts/**/*.md`（90+ 篇文章）
-- **站点配置**：`src/config.ts`
-- **样式变量**：`src/styles/variables.styl`
 
