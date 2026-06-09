@@ -95,7 +95,6 @@ const latestDateText = latestDate
     {renderedPosts[0] && (
         <section class="featured-section">
             <FeaturedCard
-                entry={renderedPosts[0].entry}
                 title={renderedPosts[0].entry.data.title}
                 tags={renderedPosts[0].entry.data.tags}
                 category={renderedPosts[0].entry.data.category}
@@ -122,7 +121,6 @@ const latestDateText = latestDate
             <div class="featured-grid">
                 {renderedPosts.slice(1).map(({ entry, remarkPluginFrontmatter }, i) => (
                     <FeaturedCard
-                        entry={entry}
                         title={entry.data.title}
                         tags={entry.data.tags}
                         category={entry.data.category}

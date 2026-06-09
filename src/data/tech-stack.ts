@@ -48,7 +48,10 @@ const languages: TechEntry[] = [
 		name: "TypeScript",
 		category: "编程语言",
 		note: "JS 的超集，类型让代码更稳",
-		relatedPosts: ["编程生涯ts的学习", "编程生涯tsjavapython三语言全栈框架认知"],
+		relatedPosts: [
+			"编程生涯ts的学习",
+			"编程生涯tsjavapython三语言全栈框架认知",
+		],
 		startedAt: "2024-04",
 	},
 	{

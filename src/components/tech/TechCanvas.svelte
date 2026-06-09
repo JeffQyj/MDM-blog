@@ -1,6 +1,6 @@
 <script lang="ts">
-import cytoscape from "cytoscape";
 import type { Core, ElementDefinition, EventObject } from "cytoscape";
+import cytoscape from "cytoscape";
 import fcose from "cytoscape-fcose";
 import { onDestroy, onMount } from "svelte";
 
@@ -33,19 +33,29 @@ let layout: any = null;
 let hoveredId: string | null = null;
 
 /**
- * 节点样式（金色胶囊）
- * - 全称直接渲染在节点内（去缩写）
- * - 所有节点统一大小与配色（去三态分级）
+ * 节点样式（椭圆 + 灯芯发光）
+ * - shape: ellipse，宽度跟随 label 自适应，高度固定，形成横向"胶囊"（视觉上是圆角椭圆）
+ * - 边框亮金色 + 外圈 outline 模拟光晕
+ * - 文字加深色描边（text-outline）增强星空背景下的可读性
  */
 const NODE_STYLE_BASE = {
-	shape: "round-rectangle",
-	"background-color": "oklch(0.78 0.13 85 / 0.16)",
+	shape: "ellipse",
+	"background-color": "oklch(0.18 0.03 var(--hue) / 0.78)",
 	"background-opacity": 1,
-	"border-color": "oklch(0.78 0.13 85)",
+	"border-color": "oklch(0.88 0.13 88)",
 	"border-width": 1.5,
-	"border-opacity": 0.7,
+	"border-opacity": 0.95,
+	// 外发光圈（cytoscape outline-*，硬边光圈）
+	"outline-color": "oklch(0.82 0.14 85 / 0.45)",
+	"outline-width": 3,
+	"outline-offset": 1,
+	"outline-opacity": 1,
+	// 文字描边，提升星空背景下的可读性
+	"text-outline-color": "oklch(0.06 0.015 var(--hue) / 0.95)",
+	"text-outline-width": 2,
+	"text-outline-opacity": 1,
 	label: "data(name)",
-	color: "oklch(0.95 0.01 var(--hue))",
+	color: "oklch(0.96 0.05 88)",
 	"font-family":
 		"'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace",
 	"font-size": 11,
@@ -54,15 +64,14 @@ const NODE_STYLE_BASE = {
 	"text-halign": "center",
 	"text-wrap": "wrap",
 	"text-max-width": "150px",
-	"text-outline-width": 0,
 	"overlay-opacity": 0,
-	// 节点尺寸：宽度随 label 自适应、高度固定为 30，留 8px 内边距
+	// 椭圆尺寸：宽=label+padding（横向自适应），高=固定 22（形成扁椭圆）
 	width: "label" as const,
-	height: 30,
-	"padding": "8px",
+	height: 22,
+	padding: "10px",
 	"transition-property":
-		"background-color, border-color, border-width, border-opacity, width, height, opacity",
-	"transition-duration": 200,
+		"background-color, border-color, border-width, border-opacity, outline-color, outline-width, outline-opacity, width, height, opacity",
+	"transition-duration": 250,
 };
 
 const STYLE = [
@@ -71,17 +80,17 @@ const STYLE = [
 		selector: "edge",
 		style: {
 			width: 0.5,
-			"line-color": "rgba(255,255,255,0.15)",
+			"line-color": "oklch(0.78 0.08 220 / 0.22)",
 			"curve-style": "straight",
-			opacity: 0.6,
+			opacity: 0.7,
 		},
 	},
 	{
 		selector: 'edge[type = "strong"]',
 		style: {
-			width: 1.5,
-			"line-color": "oklch(0.78 0.13 85)",
-			opacity: 0.55,
+			width: 1.4,
+			"line-color": "oklch(0.85 0.13 85 / 0.7)",
+			opacity: 0.75,
 			"curve-style": "bezier",
 			"control-point-step-size": 40,
 		},
@@ -89,14 +98,17 @@ const STYLE = [
 	// === 交互高亮 ===
 	{
 		selector: ".faded",
-		style: { opacity: 0.1 },
+		style: { opacity: 0.12 },
 	},
 	{
 		selector: ".highlighted-node",
 		style: {
 			"border-width": 2.5,
-			"border-color": "oklch(0.95 0.13 88)",
-			"background-color": "oklch(0.78 0.13 85 / 0.32)",
+			"border-color": "oklch(0.98 0.13 88)",
+			"background-color": "oklch(0.22 0.05 var(--hue) / 0.92)",
+			"outline-color": "oklch(0.95 0.15 88 / 0.85)",
+			"outline-width": 5,
+			"outline-offset": 2,
 			"z-index": 999,
 		},
 	},
@@ -104,8 +116,10 @@ const STYLE = [
 		selector: ".highlighted-neighbor",
 		style: {
 			"border-width": 2,
-			"border-color": "oklch(0.85 0.13 88)",
-			"background-color": "oklch(0.78 0.13 85 / 0.24)",
+			"border-color": "oklch(0.9 0.13 88)",
+			"background-color": "oklch(0.2 0.04 var(--hue) / 0.85)",
+			"outline-color": "oklch(0.88 0.13 88 / 0.6)",
+			"outline-width": 4,
 		},
 	},
 	{
@@ -302,6 +316,8 @@ $: if (cy && $resetViewTrigger > 0) {
 </script>
 
 <div bind:this={container} class="tech-canvas" aria-label="技术神经图谱画布">
+	<!-- 银河 / 星云层 -->
+	<div class="tech-canvas__nebula" aria-hidden="true"></div>
 	<!-- Cytoscape 在此渲染 -->
 </div>
 
@@ -321,49 +337,115 @@ $: if (cy && $resetViewTrigger > 0) {
 		width: 100%;
 		height: 100%;
 		min-height: 600px;
+		/* 星空底色：深空蓝紫 → 边缘近黑 */
 		background:
 			radial-gradient(
-				ellipse at center,
-				oklch(0.22 0.025 var(--hue) / 0.5) 0%,
-				oklch(0.14 0.015 var(--hue)) 70%,
-				oklch(0.1 0.01 var(--hue)) 100%
+				ellipse at 50% 28%,
+				oklch(0.2 0.06 270) 0%,
+				oklch(0.12 0.04 245) 45%,
+				oklch(0.07 0.025 220) 100%
 			);
 		overflow: hidden;
 		border-radius: var(--radius-large);
-		border: 1px solid oklch(0.5 0.02 var(--hue) / 0.2);
+		border: 1px solid oklch(0.5 0.06 230 / 0.35);
+		box-shadow:
+			inset 0 0 100px oklch(0.15 0.06 260 / 0.5),
+			inset 0 0 200px oklch(0.4 0.1 280 / 0.12);
 	}
 
-	/* 极淡的星点装饰（性能友好：纯 CSS，零 JS） */
+	/* 银河/星云层（z-index 最低） */
+	.tech-canvas__nebula {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		z-index: 0;
+		background:
+			/* 主银河带 */
+			radial-gradient(
+				ellipse 70% 18% at 50% 38%,
+				oklch(0.55 0.18 290 / 0.18) 0%,
+				oklch(0.45 0.15 260 / 0.08) 35%,
+				transparent 70%
+			),
+			/* 紫色星云 */
+			radial-gradient(
+				ellipse 45% 25% at 22% 70%,
+				oklch(0.5 0.18 310 / 0.12) 0%,
+				transparent 65%
+			),
+			/* 蓝色星云 */
+			radial-gradient(
+				ellipse 40% 20% at 80% 75%,
+				oklch(0.55 0.12 220 / 0.1) 0%,
+				transparent 65%
+			);
+		filter: blur(30px);
+	}
+
+	/* 密集小星点层（错落网格 + 缓慢闪烁） */
 	.tech-canvas::before {
 		content: "";
 		position: absolute;
 		inset: 0;
 		pointer-events: none;
+		z-index: 1;
 		background-image:
-			radial-gradient(0.5px 0.5px at 12% 18%, rgba(255, 255, 255, 0.6) 50%, transparent 100%),
-			radial-gradient(0.5px 0.5px at 27% 47%, rgba(255, 255, 255, 0.5) 50%, transparent 100%),
-			radial-gradient(0.5px 0.5px at 41% 73%, rgba(255, 255, 255, 0.7) 50%, transparent 100%),
-			radial-gradient(0.5px 0.5px at 58% 21%, oklch(0.85 0.1 85) 50%, transparent 100%),
-			radial-gradient(0.5px 0.5px at 73% 64%, rgba(255, 255, 255, 0.5) 50%, transparent 100%),
-			radial-gradient(0.5px 0.5px at 88% 38%, rgba(255, 255, 255, 0.6) 50%, transparent 100%),
-			radial-gradient(0.5px 0.5px at 5% 82%, rgba(255, 255, 255, 0.4) 50%, transparent 100%),
-			radial-gradient(0.5px 0.5px at 94% 88%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
+			radial-gradient(0.6px 0.6px at 50% 50%, rgba(255, 255, 255, 0.85) 50%, transparent 100%),
+			radial-gradient(0.5px 0.5px at 25% 25%, rgba(255, 255, 255, 0.7) 50%, transparent 100%),
+			radial-gradient(0.5px 0.5px at 75% 75%, rgba(255, 255, 255, 0.65) 50%, transparent 100%),
+			radial-gradient(0.7px 0.7px at 12% 78%, rgba(255, 255, 255, 0.8) 50%, transparent 100%);
 		background-size:
-			300px 300px,
-			280px 280px,
-			350px 350px,
-			320px 320px,
-			290px 290px,
-			310px 310px,
-			270px 270px,
-			330px 330px;
-		opacity: 0.65;
-		z-index: 0;
+			90px 90px,
+			120px 120px,
+			150px 150px,
+			180px 180px;
+		background-position:
+			0 0,
+			45px 30px,
+			20px 60px,
+			70px 90px;
+		opacity: 0.7;
+		animation: techTwinkle 4s ease-in-out infinite alternate;
 	}
 
+	/* 大星点层（彩色：白/金/蓝紫，带自身光晕） */
+	.tech-canvas::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		z-index: 1;
+		background-image:
+			radial-gradient(1.2px 1.2px at 8% 18%, oklch(0.95 0.1 85) 50%, transparent 100%),
+			radial-gradient(1px 1px at 18% 62%, oklch(0.92 0.05 60) 50%, transparent 100%),
+			radial-gradient(1.4px 1.4px at 33% 35%, oklch(0.98 0.04 30) 50%, transparent 100%),
+			radial-gradient(1px 1px at 52% 12%, oklch(0.9 0.08 220) 50%, transparent 100%),
+			radial-gradient(1.2px 1.2px at 68% 28%, oklch(0.95 0.06 200) 50%, transparent 100%),
+			radial-gradient(1.5px 1.5px at 82% 52%, oklch(0.96 0.05 80) 50%, transparent 100%),
+			radial-gradient(1px 1px at 92% 22%, oklch(0.88 0.12 290) 50%, transparent 100%),
+			radial-gradient(1.1px 1.1px at 95% 82%, oklch(0.95 0.04 30) 50%, transparent 100%),
+			radial-gradient(1.3px 1.3px at 75% 88%, oklch(0.92 0.08 240) 50%, transparent 100%),
+			radial-gradient(0.9px 0.9px at 42% 78%, oklch(0.95 0.1 50) 50%, transparent 100%),
+			radial-gradient(1.1px 1.1px at 12% 92%, oklch(0.9 0.06 280) 50%, transparent 100%),
+			radial-gradient(1px 1px at 60% 60%, oklch(0.98 0.03 60) 50%, transparent 100%);
+		animation: techTwinkle 5.5s ease-in-out infinite alternate;
+		animation-delay: 1.8s;
+	}
+
+	@keyframes techTwinkle {
+		0%,
+		100% {
+			opacity: 0.55;
+		}
+		50% {
+			opacity: 1;
+		}
+	}
+
+	/* cytoscape 画布在星空层之上 */
 	.tech-canvas :global(canvas) {
 		position: relative;
-		z-index: 1;
+		z-index: 2;
 	}
 
 	.tech-canvas__hint {
