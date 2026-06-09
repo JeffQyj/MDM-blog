@@ -29,8 +29,8 @@ const CATEGORY_HUES: Record<string, number> = {
 	"设计": 18, // 橙
 };
 
-const CLUSTER_RADIUS = 80; // 分类中心到原点的距离
-const NODE_LOCAL_RADIUS = 14; // 单个分类内节点的散布半径
+const CLUSTER_RADIUS = 18; // 分类中心到原点的距离（聚拢版）
+const NODE_LOCAL_RADIUS = 8; // 单个分类内节点的散布半径（聚拢版）
 // v2：所有技术节点统一尺寸（同级别，不按 relatedPosts 差异化）
 const BASE_NODE_SIZE = 2.0;
 

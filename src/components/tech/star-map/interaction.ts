@@ -401,7 +401,7 @@ export function setupInteraction(opts: InteractionOptions): InteractionHandle {
 	}
 
 	function resetCamera() {
-		easeTo(new Vector3(0, 30, 100), new Vector3(0, 0, 0));
+		easeTo(new Vector3(0, 18, 60), new Vector3(0, 0, 0));
 	}
 
 	function focusNode(id: string) {

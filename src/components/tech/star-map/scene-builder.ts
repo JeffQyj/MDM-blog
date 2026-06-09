@@ -41,7 +41,7 @@ export function buildScene(container: HTMLElement): SceneBundle {
 		0.1,
 		2000,
 	);
-	camera.position.set(0, 30, 100);
+	camera.position.set(0, 18, 60);
 	camera.lookAt(0, 0, 0);
 
 	// === Renderer ===

@@ -10,7 +10,6 @@ import {
 	resetCameraTrigger,
 } from "@/stores/tech-store";
 import { buildGraph } from "@/utils/tech-utils";
-import StarMapLegend from "./StarMapLegend.svelte";
 import StarMapTooltip from "./StarMapTooltip.svelte";
 import { computeConstellationLayout } from "./star-map/constellation-layout";
 import { createConstellationLines } from "./star-map/constellation-lines";
@@ -220,22 +219,6 @@ onMount(() => {
 	<div bind:this={labelContainer} class="star-map__labels"></div>
 
 	<StarMapTooltip />
-	<StarMapLegend />
-
-	<!-- 操作提示 -->
-	<div class="star-map__hint" aria-hidden="true">
-		<span>拖拽旋转</span>
-		<span class="dot">·</span>
-		<span>滚轮缩放</span>
-		<span class="dot">·</span>
-		<span>悬停查看</span>
-		<span class="dot">·</span>
-		<span>单击涟漪</span>
-		<span class="dot">·</span>
-		<span>双击聚焦</span>
-		<span class="dot">·</span>
-		<span>R 重置</span>
-	</div>
 </div>
 
 <style>
