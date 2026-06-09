@@ -1,6 +1,5 @@
 ---
-import TechCanvas from "@components/tech/TechCanvas.svelte";
-import TechTooltip from "@components/tech/TechTooltip.svelte";
+import StarMap3D from "@components/tech/StarMap3D.svelte";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
@@ -57,12 +56,11 @@ import MainGridLayout from "@layouts/MainGridLayout.astro";
 		</section>
 
 		<!-- ============================================
-		     主舞台：画布 + Tooltip 浮层
-		     Tooltip 需放在 canvas 同级，以便 absolute 定位
+		     主舞台：Three.js 3D 星图
+		     client:only 避免 SSR（依赖 window）
 		     ============================================ -->
 		<div class="tech-stage">
-			<TechCanvas client:only="svelte" />
-			<TechTooltip client:only="svelte" />
+			<StarMap3D client:only="svelte" />
 		</div>
 	</div>
 </MainGridLayout>

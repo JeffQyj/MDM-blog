@@ -38,8 +38,6 @@
     "astro": "5.13.10",
     "astro-expressive-code": "^0.41.4",
     "astro-icon": "^1.1.5",
-    "cytoscape": "^3.33.3",
-    "cytoscape-fcose": "^2.2.0",
     "hastscript": "^9.0.1",
     "katex": "^0.16.27",
     "markdown-it": "^14.1.0",
@@ -64,6 +62,7 @@
     "stylus": "^0.64.0",
     "svelte": "^5.39.8",
     "tailwindcss": "^3.4.19",
+    "three": "^0.184.0",
     "typescript": "^5.9.3",
     "unist-util-visit": "^5.0.0"
   },
@@ -75,6 +74,7 @@
     "@types/markdown-it": "^14.1.2",
     "@types/mdast": "^4.0.4",
     "@types/sanitize-html": "^2.16.0",
+    "@types/three": "^0.184.1",
     "playwright": "^1.60.0",
     "postcss-import": "^16.1.1",
     "postcss-nesting": "^13.0.2"

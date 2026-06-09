@@ -3,10 +3,9 @@ import { hoveredTech } from "@/stores/tech-store";
 
 /**
  * 节点 hover 时显示的 tooltip
- * - 由 TechCanvas 触发，位置来自画布坐标系
- * - 展示：技术全称 + 分类 + 个人点评
- *
- * 已下线：状态点、点击查看详情提示
+ * - 由 interaction.ts 触发
+ * - 位置来自屏幕坐标 (clientX, clientY)
+ * - 展示：技术全称 + 分类 + 首次接触 + 个人点评
  */
 </script>
 
@@ -42,22 +41,23 @@ import { hoveredTech } from "@/stores/tech-store";
 			"JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Monaco,
 			monospace;
 
-		position: absolute;
+		position: fixed;
 		transform: translate(-50%, calc(-100% - 18px));
 		pointer-events: none;
-		z-index: 100;
+		z-index: 1000;
 
 		min-width: 220px;
 		max-width: 320px;
 		padding: 0.625rem 0.875rem;
 		border-radius: 4px;
-		background: oklch(0.13 0.015 var(--hue) / 0.95);
-		backdrop-filter: blur(10px);
-		-webkit-backdrop-filter: blur(10px);
-		border: 1px solid oklch(0.78 0.13 85 / 0.4);
+		background: oklch(0.1 0.015 var(--hue) / 0.96);
+		backdrop-filter: blur(14px);
+		-webkit-backdrop-filter: blur(14px);
+		border: 1px solid oklch(0.78 0.13 85 / 0.5);
 		box-shadow:
-			0 8px 24px -6px rgb(0 0 0 / 0.5),
-			0 0 0 1px oklch(0.78 0.13 85 / 0.1);
+			0 8px 28px -6px rgb(0 0 0 / 0.65),
+			0 0 0 1px oklch(0.78 0.13 85 / 0.12),
+			0 0 22px oklch(0.78 0.13 85 / 0.18);
 		color: oklch(0.95 0.01 var(--hue));
 		font-family: var(--mono);
 		animation: tooltipIn 0.18s ease-out;
@@ -72,9 +72,9 @@ import { hoveredTech } from "@/stores/tech-store";
 		transform: translateX(-50%) rotate(45deg);
 		width: 10px;
 		height: 10px;
-		background: oklch(0.13 0.015 var(--hue) / 0.95);
-		border-right: 1px solid oklch(0.78 0.13 85 / 0.4);
-		border-bottom: 1px solid oklch(0.78 0.13 85 / 0.4);
+		background: oklch(0.1 0.015 var(--hue) / 0.96);
+		border-right: 1px solid oklch(0.78 0.13 85 / 0.5);
+		border-bottom: 1px solid oklch(0.78 0.13 85 / 0.5);
 	}
 
 	@keyframes tooltipIn {
@@ -103,8 +103,8 @@ import { hoveredTech } from "@/stores/tech-store";
 		height: 8px;
 		border-radius: 50%;
 		flex-shrink: 0;
-		background: oklch(0.78 0.13 85);
-		box-shadow: 0 0 6px oklch(0.78 0.13 85);
+		background: oklch(0.85 0.13 85);
+		box-shadow: 0 0 8px oklch(0.85 0.13 85);
 	}
 
 	.tech-tooltip__meta {
