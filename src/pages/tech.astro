@@ -1,13 +1,9 @@
 ---
 import TechCanvas from "@components/tech/TechCanvas.svelte";
-import TechFilter from "@components/tech/TechFilter.svelte";
 import TechTooltip from "@components/tech/TechTooltip.svelte";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
-import { techStack } from "@/data/tech-stack";
-
-const totalCount = techStack.length;
 ---
 
 <MainGridLayout
@@ -55,20 +51,10 @@ const totalCount = techStack.length;
 
 				<!-- 副标题 -->
 				<p class="tech-hero__subtitle">
-					罗列我学过与认知到的技术栈　<span class="tech-hero__subtitle-sep">|</span>　共 {totalCount} 项
-				</p>
-
-				<!-- 操作提示 -->
-				<p class="tech-hero__hint">
-					悬停查看 · 双击聚焦 · 拖拽节点
+					欢迎探索我的技术宇宙
 				</p>
 			</div>
 		</section>
-
-		<!-- ============================================
-		     筛选条
-		     ============================================ -->
-		<TechFilter client:only="svelte" />
 
 		<!-- ============================================
 		     主舞台：画布 + Tooltip 浮层
