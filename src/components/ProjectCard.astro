@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { getCategoryUrl } from "@utils/url-utils";
+import { getCategoryUrl, getPostUrlBySlug } from "@utils/url-utils";
 import { Icon } from "astro-icon/components";
 
 interface Props {
@@ -35,7 +35,7 @@ const readMinutesText = `${readMinutes} min`;
 // 仅展示前 4 个技术栈
 const visibleTech = (techStack ?? []).slice(0, 4);
 
-const url = `/posts/${entry.slug}/`;
+const url = getPostUrlBySlug(entry.slug);
 const hasCategory = !!category;
 ---
 
