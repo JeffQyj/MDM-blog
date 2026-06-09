@@ -11,7 +11,6 @@
  */
 import {
 	ACESFilmicToneMapping,
-	Color,
 	PerspectiveCamera,
 	Scene,
 	SRGBColorSpace,

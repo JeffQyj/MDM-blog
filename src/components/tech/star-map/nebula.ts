@@ -12,11 +12,10 @@ import {
 	AdditiveBlending,
 	Color,
 	DoubleSide,
+	Group,
 	Mesh,
-	Object3D,
 	PlaneGeometry,
 	ShaderMaterial,
-	SphereGeometry,
 } from "three";
 import type { NebulaHandle } from "./types";
 
@@ -189,7 +188,7 @@ const CLOUD_CONFIGS: PatchConfig[] = [
 ];
 
 export function createNebula(): NebulaHandle {
-	const group = new Object3D();
+	const group = new Group();
 	group.name = "nebula";
 
 	const mats: ShaderMaterial[] = [];

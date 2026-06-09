@@ -87,13 +87,3 @@ export interface NebulaHandle {
 	update(t: number): void;
 	dispose(): void;
 }
-
-/** 交互上下文 */
-export interface InteractionContext {
-	camera: import("three").PerspectiveCamera;
-	renderer: import("three").WebGLRenderer;
-	controls: import("three").OrbitControls;
-	nodes3D: StarNodesHandle;
-	lines3D: ConstellationLinesHandle;
-	labelContainer: HTMLElement;
-}

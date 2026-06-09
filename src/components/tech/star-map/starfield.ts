@@ -10,7 +10,7 @@ import {
 	AdditiveBlending,
 	BufferAttribute,
 	BufferGeometry,
-	Object3D,
+	Group,
 	Points,
 	ShaderMaterial,
 } from "three";
@@ -109,7 +109,7 @@ void main() {
 `;
 
 export function createStarField(): StarFieldHandle {
-	const group = new Object3D();
+	const group = new Group();
 	group.name = "starfield";
 
 	const layers: StarLayer[] = LAYER_CONFIGS.map((cfg, layerIdx) => {

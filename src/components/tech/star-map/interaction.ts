@@ -12,7 +12,6 @@
  */
 import {
 	BufferGeometry,
-	Color,
 	Float32BufferAttribute,
 	Group,
 	Line,
@@ -419,7 +418,7 @@ export function setupInteraction(opts: InteractionOptions): InteractionHandle {
 	}
 
 	return {
-		update(dt) {
+		update(_dt) {
 			const now = performance.now() / 1000;
 			const realDt = now - lastFrameTime;
 			lastFrameTime = now;

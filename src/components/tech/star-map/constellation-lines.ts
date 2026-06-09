@@ -11,9 +11,9 @@ import {
 	BufferAttribute,
 	BufferGeometry,
 	Color,
+	Group,
 	LineBasicMaterial,
 	LineSegments,
-	Object3D,
 	Points,
 	PointsMaterial,
 } from "three";
@@ -40,7 +40,7 @@ export function createConstellationLines(
 	edges: { id: string; source: string; target: string; type: "category" | "strong" }[],
 	nodes: PositionedNode[],
 ): ConstellationLinesHandle {
-	const group = new Object3D();
+	const group = new Group();
 	group.name = "constellation-lines";
 
 	// 节点 id → 位置索引
@@ -183,14 +183,14 @@ export function createConstellationLines(
 			for (let i = 0; i < strong.length; i++) {
 				const e = strong[i];
 				const s = idToNode.get(e.source)!;
-				const t = idToNode.get(e.target)!;
+				const tn = idToNode.get(e.target)!;
 				for (let j = 0; j < PARTICLES_PER_EDGE; j++) {
 					const idx = i * PARTICLES_PER_EDGE + j;
 					// 错相位：3 颗粒子均匀分布，沿边往复
 					const phase = ((t * 0.6 + j / PARTICLES_PER_EDGE) % 1 + 1) % 1;
-					const px = s.position.x + (t.position.x - s.position.x) * phase;
-					const py = s.position.y + (t.position.y - s.position.y) * phase;
-					const pz = s.position.z + (t.position.z - s.position.z) * phase;
+					const px = s.position.x + (tn.position.x - s.position.x) * phase;
+					const py = s.position.y + (tn.position.y - s.position.y) * phase;
+					const pz = s.position.z + (tn.position.z - s.position.z) * phase;
 					posAttr.setXYZ(idx, px, py, pz);
 				}
 			}
