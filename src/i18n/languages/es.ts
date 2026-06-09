@@ -6,6 +6,7 @@ export const es: Translation = {
 	[Key.about]: "Sobre mí",
 	[Key.archive]: "Archivo",
 	[Key.featured]: "Destacados",
+	[Key.projects]: "Proyectos",
 	[Key.search]: "Buscar",
 
 	[Key.tags]: "Etiquetas",

@@ -1,0 +1,16 @@
+---
+import ProjectsPanel from "@components/ProjectsPanel.astro";
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { getProjectPosts } from "../utils/content-utils";
+
+const projectPosts = await getProjectPosts();
+---
+
+<MainGridLayout
+	title={i18n(I18nKey.projects)}
+	description="项目档案：独立项目与二次开发全集"
+>
+	<ProjectsPanel posts={projectPosts}></ProjectsPanel>
+</MainGridLayout>

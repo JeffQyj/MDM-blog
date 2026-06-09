@@ -54,6 +54,16 @@ export async function getFeaturedPosts(): Promise<CollectionEntry<"posts">[]> {
 	const allPosts = await getRawSortedPosts();
 	return allPosts.filter((post) => post.data.featured === true);
 }
+
+// 项目页使用：聚合 category 为 "独立项目" 或 "二次开发" 的全部文章，按 published 倒序
+// 返回完整 entry（含 body）供 Astro 组件在构建时调用 entry.render()
+export async function getProjectPosts(): Promise<CollectionEntry<"posts">[]> {
+	const allPosts = await getRawSortedPosts();
+	return allPosts.filter(
+		(post) =>
+			post.data.category === "独立项目" || post.data.category === "二次开发",
+	);
+}
 export type Tag = {
 	name: string;
 	count: number;

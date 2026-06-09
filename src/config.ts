@@ -49,12 +49,8 @@ export const navBarConfig: NavBarConfig = {
 		LinkPreset.Home,
 		LinkPreset.Archive,
 		LinkPreset.Featured,
+		LinkPreset.Projects,
 		LinkPreset.About,
-		{
-			name: "GitHub",
-			url: "https://github.com/JeffQyj",
-			external: true,
-		},
 	],
 };
 

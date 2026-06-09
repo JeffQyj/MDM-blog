@@ -1,0 +1,658 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getCategoryUrl } from "@utils/url-utils";
+import { Icon } from "astro-icon/components";
+
+export type ProjectStatus = "ACTIVE" | "DEPLOYED" | "ARCHIVED" | "DRAFT";
+
+interface Props {
+	entry: CollectionEntry<"posts">;
+	projectCode: string;
+	status: ProjectStatus;
+	techStack: string[];
+	index: number;
+	class?: string;
+	style?: string;
+}
+
+const {
+	entry,
+	projectCode,
+	status,
+	techStack,
+	index,
+	class: className,
+	style,
+} = Astro.props;
+
+const { title, published, category, description } = entry.data;
+
+// 摘要：description 优先，fallback 到 remark 提取的 excerpt
+const { remarkPluginFrontmatter } = await entry.render();
+const summary = description || remarkPluginFrontmatter?.excerpt || "";
+const readMinutes = Math.max(1, remarkPluginFrontmatter?.minutes || 1);
+
+// 序号 01/02/03 ...（用于动画 delay 与左上角小标）
+const indexText = String(index).padStart(2, "0");
+
+// 发布日期格式化
+const publishDate = published as Date;
+const publishDateText = publishDate
+	? `${publishDate.getFullYear()}.${String(publishDate.getMonth() + 1).padStart(2, "0")}.${String(publishDate.getDate()).padStart(2, "0")}`
+	: "";
+
+// 阅读时长文本
+const readMinutesText = `${readMinutes} min`;
+
+// 仅展示前 4 个技术栈
+const visibleTech = (techStack ?? []).slice(0, 4);
+
+// 状态颜色变量映射
+const statusColorVar =
+	status === "ACTIVE"
+		? "var(--blueprint-active)"
+		: status === "DEPLOYED"
+			? "var(--blueprint-deployed)"
+			: status === "DRAFT"
+				? "var(--blueprint-draft)"
+				: "var(--blueprint-archived)";
+
+// 状态简短描述（中文 + 英文双标）
+const statusLabelMap: Record<ProjectStatus, { en: string; zh: string }> = {
+	ACTIVE: { en: "ACTIVE", zh: "运行中" },
+	DEPLOYED: { en: "DEPLOYED", zh: "已部署" },
+	ARCHIVED: { en: "ARCHIVED", zh: "归档" },
+	DRAFT: { en: "DRAFT", zh: "草稿" },
+};
+const statusLabel = statusLabelMap[status];
+
+const url = `/posts/${entry.slug}/`;
+const hasCategory = !!category;
+---
+
+<article
+	class:list={["project-card group", className]}
+	style={style}
+	data-project-card
+	data-category={category ?? ""}
+	data-published={publishDate ? publishDate.getTime() : 0}
+	aria-label={title}
+>
+	<!-- 四角 CAD 角标 -->
+	<span class="project-card__corner project-card__corner--tl" aria-hidden="true"></span>
+	<span class="project-card__corner project-card__corner--tr" aria-hidden="true"></span>
+	<span class="project-card__corner project-card__corner--bl" aria-hidden="true"></span>
+	<span class="project-card__corner project-card__corner--br" aria-hidden="true"></span>
+
+	<!-- 顶部条形：项目代号 + 状态 -->
+	<header class="project-card__topbar">
+		<div class="project-card__topbar-left">
+			<span class="project-card__index" aria-hidden="true">{indexText}</span>
+			<span class="project-card__code">{projectCode}</span>
+		</div>
+		<div class="project-card__topbar-right">
+			<span
+				class="project-card__status project-card__status--{status.toLowerCase()}"
+				data-status={status}
+				style={`--status-color: ${statusColorVar};`}
+				aria-label={`状态：${statusLabel.zh}`}
+			>
+				<span class="project-card__led" aria-hidden="true"></span>
+				<span class="project-card__status-text">
+					<span class="project-card__status-en">{statusLabel.en}</span>
+					<span class="project-card__status-zh">{statusLabel.zh}</span>
+				</span>
+			</span>
+		</div>
+	</header>
+
+	<!-- 主体：标题 + 描述 + 标签链接 -->
+	<div class="project-card__body">
+		<!-- 分类（仅展示用，点击通过 featured 卡片标题走） -->
+		{hasCategory && (
+			<a
+				href={getCategoryUrl(category)}
+				class="project-card__category"
+				aria-label={`查看 ${category} 分类下所有文章`}
+			>
+				<span class="project-card__category-dot" aria-hidden="true"></span>
+				{category}
+			</a>
+		)}
+
+		<!-- 标题 -->
+		<a href={url} class="project-card__title" aria-label={title}>
+			{title}
+		</a>
+
+		<!-- 描述（2 行截断） -->
+		<p class="project-card__summary">{summary}</p>
+
+		<!-- 技术栈芯片 -->
+		{visibleTech.length > 0 && (
+			<div class="project-card__tech" aria-label="技术栈">
+				{visibleTech.map((tech) => (
+					<span class="project-card__tech-chip">
+						<span class="project-card__tech-square" aria-hidden="true"></span>
+						{tech.trim()}
+					</span>
+				))}
+			</div>
+		)}
+	</div>
+
+	<!-- 底部：尺寸标注线 + 元数据 + READ 按钮 -->
+	<footer class="project-card__footer">
+		<!-- 尺寸标注线（scale bar） -->
+		<div class="project-card__scalebar" aria-hidden="true">
+			<span class="project-card__scalebar-tick project-card__scalebar-tick--start"></span>
+			<span class="project-card__scalebar-tick"></span>
+			<span class="project-card__scalebar-tick"></span>
+			<span class="project-card__scalebar-tick project-card__scalebar-tick--end"></span>
+		</div>
+
+		<div class="project-card__meta-row">
+			<div class="project-card__meta">
+				<span class="project-card__meta-item">
+					<Icon name="material-symbols:calendar-today-rounded" class="project-card__meta-icon" />
+					<time datetime={published?.toISOString?.()}>{publishDateText}</time>
+				</span>
+				<span class="project-card__meta-item">
+					<Icon name="material-symbols:schedule-rounded" class="project-card__meta-icon" />
+					<span>{readMinutesText}</span>
+				</span>
+				{hasCategory && (
+					<span class="project-card__meta-item project-card__meta-item--category">
+						<Icon name="material-symbols:category-rounded" class="project-card__meta-icon" />
+						<span>{category}</span>
+					</span>
+				)}
+			</div>
+			<a
+				href={url}
+				aria-label={`阅读 ${title}`}
+				class="project-card__read-btn"
+			>
+				<span class="project-card__read-text">READ</span>
+				<Icon name="material-symbols:arrow-forward-rounded" class="project-card__read-arrow" />
+			</a>
+		</div>
+	</footer>
+</article>
+
+<style>
+	/* ============================================
+	   Tokens
+	   ============================================ */
+	.project-card {
+		--mono:
+			"JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Monaco,
+			Consolas, "Liberation Mono", "Courier New", monospace;
+		--display: "Syne", "Noto Serif SC", "Source Han Serif SC", serif;
+		--accent: var(--primary);
+		--blueprint-line-color: var(--blueprint-line, oklch(0.55 0.02 var(--hue) / 0.18));
+		--blueprint-active: var(--blueprint-active, oklch(0.78 0.16 220));
+		--blueprint-deployed: var(--blueprint-deployed, oklch(0.72 0.18 145));
+		--blueprint-archived: var(--blueprint-archived, oklch(0.55 0.02 var(--hue)));
+		--blueprint-draft: var(--blueprint-draft, oklch(0.72 0.18 65));
+
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		padding: 1.25rem 1.5rem 1.125rem;
+		border-radius: var(--radius-large);
+		background:
+			linear-gradient(180deg, oklch(1 0 0 / 0.6) 0%, oklch(1 0 0 / 0.85) 100%),
+			var(--card-bg);
+		box-shadow:
+			inset 0 0 0 1px oklch(0.5 0.02 var(--hue) / 0.08),
+			0 1px 2px 0 rgb(0 0 0 / 0.04);
+		overflow: hidden;
+		transition:
+			transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+			box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+		animation: projectCardIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+	}
+
+	:root.dark .project-card {
+		background:
+			linear-gradient(180deg, oklch(0.23 0.015 var(--hue) / 0.85) 0%, oklch(0.23 0.015 var(--hue) / 0.95) 100%),
+			var(--card-bg);
+		box-shadow:
+			inset 0 0 0 1px oklch(0.7 0.02 var(--hue) / 0.1),
+			0 4px 14px -6px rgb(0 0 0 / 0.45);
+	}
+
+	/* 卡片底部淡淡的栅格底纹（呼应 Hero） */
+	.project-card::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		background-image:
+			linear-gradient(var(--blueprint-line-color) 1px, transparent 1px),
+			linear-gradient(90deg, var(--blueprint-line-color) 1px, transparent 1px);
+		background-size: 24px 24px;
+		background-position: -1px -1px;
+		opacity: 0.45;
+		pointer-events: none;
+		mask-image: linear-gradient(180deg, transparent 0%, oklch(0 0 0) 35%, oklch(0 0 0) 100%);
+	}
+
+	.project-card:hover {
+		transform: translateY(-4px);
+		box-shadow:
+			inset 0 0 0 1px oklch(0.5 0.02 var(--hue) / 0.16),
+			0 14px 32px -10px oklch(0.5 0.1 var(--hue) / 0.28);
+	}
+
+	:root.dark .project-card:hover {
+		box-shadow:
+			inset 0 0 0 1px oklch(0.7 0.02 var(--hue) / 0.18),
+			0 14px 32px -10px rgb(0 0 0 / 0.6);
+	}
+
+	/* ============================================
+	   四角 CAD 角标（┌ ┐ └ ┘ 形式）
+	   ============================================ */
+	.project-card__corner {
+		position: absolute;
+		width: 14px;
+		height: 14px;
+		pointer-events: none;
+		z-index: 1;
+		transition: width 0.4s ease, height 0.4s ease;
+	}
+
+	/* 角标使用伪元素绘制 L 形两条边 */
+	.project-card__corner::before,
+	.project-card__corner::after {
+		content: "";
+		position: absolute;
+		background: var(--accent);
+		opacity: 0.6;
+		transition: opacity 0.3s ease, height 0.3s ease, width 0.3s ease;
+	}
+
+	.project-card__corner--tl { top: 8px; left: 8px; }
+	.project-card__corner--tl::before { top: 0; left: 0; width: 14px; height: 2px; }
+	.project-card__corner--tl::after  { top: 0; left: 0; width: 2px;  height: 14px; }
+
+	.project-card__corner--tr { top: 8px; right: 8px; }
+	.project-card__corner--tr::before { top: 0; right: 0; width: 14px; height: 2px; }
+	.project-card__corner--tr::after  { top: 0; right: 0; width: 2px;  height: 14px; }
+
+	.project-card__corner--bl { bottom: 8px; left: 8px; }
+	.project-card__corner--bl::before { bottom: 0; left: 0; width: 14px; height: 2px; }
+	.project-card__corner--bl::after  { bottom: 0; left: 0; width: 2px;  height: 14px; }
+
+	.project-card__corner--br { bottom: 8px; right: 8px; }
+	.project-card__corner--br::before { bottom: 0; right: 0; width: 14px; height: 2px; }
+	.project-card__corner--br::after  { bottom: 0; right: 0; width: 2px;  height: 14px; }
+
+	.project-card:hover .project-card__corner {
+		width: 18px;
+		height: 18px;
+	}
+	.project-card:hover .project-card__corner::before,
+	.project-card:hover .project-card__corner::after {
+		opacity: 1;
+	}
+
+	/* ============================================
+	   顶部条形：项目代号 + 状态 LED
+	   ============================================ */
+	.project-card__topbar {
+		position: relative;
+		z-index: 2;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		padding-bottom: 0.75rem;
+		border-bottom: 1px dashed oklch(0.5 0.02 var(--hue) / 0.2);
+	}
+
+	:root.dark .project-card__topbar {
+		border-bottom-color: oklch(0.7 0.02 var(--hue) / 0.18);
+	}
+
+	.project-card__topbar-left {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.625rem;
+		font-family: var(--mono);
+		font-size: 0.6875rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+	}
+
+	.project-card__index {
+		color: var(--accent);
+		opacity: 0.7;
+		font-feature-settings: "tnum" 1;
+	}
+
+	.project-card__code {
+		color: oklch(0.45 0.02 var(--hue));
+		opacity: 0.85;
+		text-transform: uppercase;
+	}
+
+	:root.dark .project-card__code {
+		color: oklch(0.78 0.02 var(--hue));
+	}
+
+	/* 状态徽章 */
+	.project-card__status {
+		--status-color: var(--blueprint-deployed);
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4375rem;
+		padding: 0.25rem 0.625rem;
+		border-radius: 2px;
+		border: 1px solid color-mix(in oklch, var(--status-color) 60%, transparent);
+		background: color-mix(in oklch, var(--status-color) 10%, transparent);
+		font-family: var(--mono);
+		font-size: 0.625rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		color: var(--status-color);
+	}
+
+	.project-card__led {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: var(--status-color);
+		box-shadow: 0 0 0 0 var(--status-color);
+		flex-shrink: 0;
+	}
+
+	.project-card__status--active .project-card__led {
+		animation: ledPulse 2.4s ease-in-out infinite;
+	}
+
+	.project-card__status-text {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+	}
+
+	.project-card__status-en {
+		font-weight: 800;
+	}
+
+	.project-card__status-zh {
+		opacity: 0.75;
+		font-weight: 500;
+	}
+
+	/* ============================================
+	   主体：分类 + 标题 + 描述 + 技术栈
+	   ============================================ */
+	.project-card__body {
+		position: relative;
+		z-index: 2;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.project-card__category {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4375rem;
+		padding: 0.25rem 0.625rem 0.25rem 0.5rem;
+		border-radius: 2px;
+		background: var(--btn-regular-bg);
+		font-family: var(--mono);
+		font-size: 0.6875rem;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		color: oklch(0.5 0.05 var(--hue));
+		text-decoration: none;
+		width: fit-content;
+		transition: background 0.3s ease, color 0.3s ease;
+	}
+
+	.project-card__category:hover {
+		background: var(--btn-regular-bg-hover);
+		color: var(--accent);
+	}
+
+	:root.dark .project-card__category {
+		color: oklch(0.75 0.04 var(--hue));
+	}
+
+	.project-card__category-dot {
+		width: 8px;
+		height: 8px;
+		background: var(--accent);
+		display: inline-block;
+		flex-shrink: 0;
+	}
+
+	/* 标题（Syne 字体 + 紧排） */
+	.project-card__title {
+		font-family: var(--display);
+		font-size: 1.1875rem;
+		line-height: 1.32;
+		font-weight: 700;
+		color: oklch(0.25 0.02 var(--hue));
+		text-decoration: none;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		transition: color 0.3s ease;
+	}
+
+	:root.dark .project-card__title {
+		color: oklch(0.93 0.01 var(--hue));
+	}
+
+	.project-card__title:hover {
+		color: var(--accent);
+	}
+
+	/* 描述 */
+	.project-card__summary {
+		margin: 0;
+		font-size: 0.875rem;
+		line-height: 1.6;
+		color: oklch(0.5 0.02 var(--hue));
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	:root.dark .project-card__summary {
+		color: oklch(0.72 0.015 var(--hue));
+	}
+
+	/* 技术栈芯片（等宽字体 + sharp 圆角 + 方块装饰点） */
+	.project-card__tech {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.375rem;
+		margin-top: 0.125rem;
+	}
+
+	.project-card__tech-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3125rem;
+		padding: 0.1875rem 0.5rem;
+		border-radius: 2px;
+		background: oklch(0.95 0.02 var(--hue) / 0.7);
+		border: 1px solid oklch(0.55 0.02 var(--hue) / 0.18);
+		font-family: var(--mono);
+		font-size: 0.6875rem;
+		font-weight: 500;
+		color: oklch(0.4 0.04 var(--hue));
+		letter-spacing: 0.02em;
+	}
+
+	:root.dark .project-card__tech-chip {
+		background: oklch(0.28 0.02 var(--hue) / 0.7);
+		border-color: oklch(0.7 0.02 var(--hue) / 0.2);
+		color: oklch(0.78 0.02 var(--hue));
+	}
+
+	.project-card__tech-square {
+		width: 5px;
+		height: 5px;
+		background: var(--accent);
+		flex-shrink: 0;
+	}
+
+	/* ============================================
+	   底部：尺寸标注线 + 元数据 + READ
+	   ============================================ */
+	.project-card__footer {
+		position: relative;
+		z-index: 2;
+		display: flex;
+		flex-direction: column;
+		gap: 0.625rem;
+		margin-top: auto;
+	}
+
+	/* 尺寸标注线（scale bar） */
+	.project-card__scalebar {
+		position: relative;
+		height: 6px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.project-card__scalebar-tick {
+		width: 1px;
+		height: 6px;
+		background: oklch(0.55 0.02 var(--hue) / 0.5);
+	}
+
+	.project-card__scalebar-tick--start,
+	.project-card__scalebar-tick--end {
+		height: 8px;
+		background: var(--accent);
+		opacity: 0.65;
+	}
+
+	.project-card__scalebar::before {
+		content: "";
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 50%;
+		height: 1px;
+		background: oklch(0.55 0.02 var(--hue) / 0.25);
+		transform: translateY(-50%);
+	}
+
+	/* 元数据行 */
+	.project-card__meta-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+	}
+
+	.project-card__meta {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		font-family: var(--mono);
+		font-size: 0.6875rem;
+		color: oklch(0.55 0.02 var(--hue));
+	}
+
+	:root.dark .project-card__meta {
+		color: oklch(0.7 0.02 var(--hue));
+	}
+
+	.project-card__meta-item {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+	}
+
+	.project-card__meta-icon {
+		font-size: 0.875rem;
+		opacity: 0.7;
+	}
+
+	/* READ 按钮 */
+	.project-card__read-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: 0.4375rem 0.75rem;
+		border-radius: 999px;
+		background: var(--btn-regular-bg);
+		color: var(--accent);
+		font-family: var(--mono);
+		font-size: 0.6875rem;
+		font-weight: 800;
+		letter-spacing: 0.1em;
+		text-decoration: none;
+		transition:
+			background 0.35s ease,
+			transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.project-card__read-btn:hover {
+		background: var(--btn-regular-bg-hover);
+		transform: translateX(3px);
+	}
+
+	.project-card__read-arrow {
+		font-size: 0.95rem;
+	}
+
+	/* ============================================
+	   入场动画
+	   ============================================ */
+	@keyframes projectCardIn {
+		from {
+			opacity: 0;
+			transform: translateY(16px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	@keyframes ledPulse {
+		0%, 100% {
+			box-shadow: 0 0 0 0 color-mix(in oklch, var(--status-color) 50%, transparent);
+		}
+		50% {
+			box-shadow: 0 0 0 6px color-mix(in oklch, var(--status-color) 0%, transparent);
+		}
+	}
+
+	/* ============================================
+	   移动端适配
+	   ============================================ */
+	@media (max-width: 640px) {
+		.project-card {
+			padding: 1.125rem 1.125rem 1rem;
+		}
+		.project-card__title {
+			font-size: 1.0625rem;
+		}
+		.project-card__meta {
+			font-size: 0.625rem;
+			gap: 0.5rem;
+		}
+		.project-card__status-zh {
+			display: none;
+		}
+	}
+</style>
