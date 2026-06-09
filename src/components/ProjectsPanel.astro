@@ -1,7 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { Icon } from "astro-icon/components";
-import ProjectCard, { type ProjectStatus } from "./ProjectCard.astro";
+import ProjectCard from "./ProjectCard.astro";
 import ProjectsFilter from "./ProjectsFilter.svelte";
 
 interface Props {
@@ -18,7 +17,7 @@ const renderedPosts = await Promise.all(
 	}),
 );
 
-// 2) 派生统计
+// 2) 派生统计（仅保留 Hero 数据条所需的三项）
 const totalCount = renderedPosts.length;
 const independentCount = renderedPosts.filter(
 	(p) => p.entry.data.category === "独立项目",
@@ -26,79 +25,11 @@ const independentCount = renderedPosts.filter(
 const secondaryCount = renderedPosts.filter(
 	(p) => p.entry.data.category === "二次开发",
 ).length;
-
-// 技术栈去重集合（基于 tags）
-const allTags = new Set<string>();
-renderedPosts.forEach((p) => {
-	(p.entry.data.tags ?? []).forEach((t) => {
-		allTags.add(t.trim());
-	});
-});
-const techStackCount = allTags.size;
-
-// 最近发布日期（最新一篇的 published）
-const latestPost = renderedPosts[0];
-const latestDate = latestPost?.entry.data.published as Date | undefined;
-const latestDateText = latestDate
-	? `${latestDate.getFullYear()}.${String(latestDate.getMonth() + 1).padStart(2, "0")}.${String(latestDate.getDate()).padStart(2, "0")}`
-	: "—";
-
-// 时间跨度（年）
-const years = renderedPosts
-	.map((p) => (p.entry.data.published as Date).getFullYear())
-	.filter((y, i, arr) => arr.indexOf(y) === i)
-	.sort();
-const yearRangeText =
-	years.length > 0 ? `${years[0]}–${years[years.length - 1]}` : "—";
-
-// 3) 状态判定
-const now = Date.now();
-const MS_PER_DAY = 1000 * 60 * 60 * 24;
-function computeStatus(entry: CollectionEntry<"posts">): ProjectStatus {
-	if (entry.data.draft === true) return "DRAFT";
-	const published = entry.data.published as Date;
-	const days = (now - published.getTime()) / MS_PER_DAY;
-	if (days <= 180) return "ACTIVE"; // 6 个月内
-	if (days <= 730) return "DEPLOYED"; // 2 年内
-	return "ARCHIVED";
-}
-
-// 4) 生成项目代号 PRJ.YYYY.NNN
-//    按 published 倒序逐年计数（NNN 为年内序号）
-const yearSeqMap = new Map<number, number>();
-const projectCodeMap = new Map<string, string>();
-renderedPosts.forEach(({ entry }) => {
-	const d = entry.data.published as Date;
-	const year = d.getFullYear();
-	const seq = (yearSeqMap.get(year) ?? 0) + 1;
-	yearSeqMap.set(year, seq);
-	projectCodeMap.set(entry.slug, `PRJ.${year}.${String(seq).padStart(3, "0")}`);
-});
-
-// 5) 状态计数
-const statusCounts = renderedPosts.reduce(
-	(acc, p) => {
-		const s = computeStatus(p.entry);
-		acc[s] = (acc[s] ?? 0) + 1;
-		return acc;
-	},
-	{ ACTIVE: 0, DEPLOYED: 0, ARCHIVED: 0, DRAFT: 0 } as Record<
-		ProjectStatus,
-		number
-	>,
-);
-
-// 6) 取出"最近构建"的项目作为 Hero 大数字（最新一篇的标题前 24 字）
-const latestProjectTitle = latestPost
-	? latestPost.entry.data.title.length > 26
-		? `${latestPost.entry.data.title.slice(0, 26)}…`
-		: latestPost.entry.data.title
-	: "—";
 ---
 
 <div class="projects-page">
 	<!-- ============================================
-	     Hero 英雄区
+	     Hero 英雄区（精简版：标题 + 副标题 + 3 项数据）
 	     ============================================ -->
 	<section
 		class="projects-hero"
@@ -106,29 +37,13 @@ const latestProjectTitle = latestPost
 	>
 		<!-- 栅格背景层 -->
 		<div class="projects-hero__grid" aria-hidden="true"></div>
-		<!-- 角落装饰：┌ ┐ └ ┘ -->
+		<!-- 四角 ┌ ┐ └ ┘ 装饰 -->
 		<span class="projects-hero__corner projects-hero__corner--tl" aria-hidden="true"></span>
 		<span class="projects-hero__corner projects-hero__corner--tr" aria-hidden="true"></span>
 		<span class="projects-hero__corner projects-hero__corner--bl" aria-hidden="true"></span>
 		<span class="projects-hero__corner projects-hero__corner--br" aria-hidden="true"></span>
-		<!-- 坐标系标记 -->
-		<span class="projects-hero__axis projects-hero__axis--x" aria-hidden="true"></span>
-		<span class="projects-hero__axis projects-hero__axis--y" aria-hidden="true"></span>
-		<!-- 扫描线 -->
-		<span class="projects-hero__scanline" aria-hidden="true"></span>
 
 		<div class="projects-hero__inner">
-			<!-- Eyebrow -->
-			<div class="projects-hero__eyebrow">
-				<span class="projects-hero__rule"></span>
-				<span class="projects-hero__eyebrow-text">
-					<span class="projects-hero__eyebrow-en">PROJECT ARCHIVE</span>
-					<span class="projects-hero__eyebrow-sep" aria-hidden="true">·</span>
-					<span class="projects-hero__eyebrow-zh">项目档案</span>
-				</span>
-				<span class="projects-hero__rule"></span>
-			</div>
-
 			<!-- 主标题 -->
 			<h1 class="projects-hero__title">
 				<span class="projects-hero__title-en">Projects</span>
@@ -140,79 +55,23 @@ const latestProjectTitle = latestPost
 				独立项目 · 二次开发　<span class="projects-hero__subtitle-sep">|</span>　共 {totalCount} 件
 			</p>
 
-			<!-- 规格数据条（ASCII 风格） -->
+			<!-- 关键数据条（3 项） -->
 			<div class="projects-hero__specs">
 				<div class="projects-hero__spec">
 					<span class="projects-hero__spec-label">TOTAL</span>
 					<span class="projects-hero__spec-value">{totalCount}</span>
-					<span class="projects-hero__spec-unit">件</span>
 				</div>
 				<span class="projects-hero__spec-sep" aria-hidden="true">│</span>
 				<div class="projects-hero__spec">
 					<span class="projects-hero__spec-label">独立项目</span>
 					<span class="projects-hero__spec-value">{independentCount}</span>
 				</div>
+				<span class="projects-hero__spec-sep" aria-hidden="true">│</span>
 				<div class="projects-hero__spec">
 					<span class="projects-hero__spec-label">二次开发</span>
 					<span class="projects-hero__spec-value">{secondaryCount}</span>
 				</div>
-				<span class="projects-hero__spec-sep" aria-hidden="true">│</span>
-				<div class="projects-hero__spec">
-					<span class="projects-hero__spec-label">STACKS</span>
-					<span class="projects-hero__spec-value">{techStackCount}</span>
-				</div>
-				<span class="projects-hero__spec-sep" aria-hidden="true">│</span>
-				<div class="projects-hero__spec">
-					<span class="projects-hero__spec-label">RANGE</span>
-					<span class="projects-hero__spec-value projects-hero__spec-value--small">
-						{yearRangeText}
-					</span>
-				</div>
-				<span class="projects-hero__spec-sep" aria-hidden="true">│</span>
-				<div class="projects-hero__spec">
-					<span class="projects-hero__spec-label">LAST BUILD</span>
-					<span class="projects-hero__spec-value projects-hero__spec-value--small">
-						{latestDateText}
-					</span>
-				</div>
 			</div>
-
-			<!-- 状态 LED 条 + 最新项目小标 -->
-			<div class="projects-hero__status">
-				<span class="projects-hero__status-item">
-					<span class="projects-hero__led projects-hero__led--active" aria-hidden="true"></span>
-					<span class="projects-hero__status-text">
-						ACTIVE <span class="projects-hero__status-num">{statusCounts.ACTIVE}</span>
-					</span>
-				</span>
-				<span class="projects-hero__status-item">
-					<span class="projects-hero__led projects-hero__led--deployed" aria-hidden="true"></span>
-					<span class="projects-hero__status-text">
-						DEPLOYED <span class="projects-hero__status-num">{statusCounts.DEPLOYED}</span>
-					</span>
-				</span>
-				<span class="projects-hero__status-item">
-					<span class="projects-hero__led projects-hero__led--archived" aria-hidden="true"></span>
-					<span class="projects-hero__status-text">
-						ARCHIVED <span class="projects-hero__status-num">{statusCounts.ARCHIVED}</span>
-					</span>
-				</span>
-				<span class="projects-hero__status-item">
-					<span class="projects-hero__led projects-hero__led--draft" aria-hidden="true"></span>
-					<span class="projects-hero__status-text">
-						DRAFT <span class="projects-hero__status-num">{statusCounts.DRAFT}</span>
-					</span>
-				</span>
-			</div>
-
-			<!-- 最新项目引用 -->
-			{latestPost && (
-				<div class="projects-hero__latest">
-					<Icon name="material-symbols:auto-awesome-rounded" class="projects-hero__latest-icon" />
-					<span class="projects-hero__latest-label">LATEST</span>
-					<span class="projects-hero__latest-title">{latestProjectTitle}</span>
-				</div>
-			)}
 		</div>
 	</section>
 
@@ -242,7 +101,7 @@ const latestProjectTitle = latestPost
 	)}
 
 	<!-- ============================================
-	     项目卡片网格
+	     项目卡片网格（限定 2 列）
 	     ============================================ -->
 	{renderedPosts.length > 0 && (
 		<section
@@ -250,14 +109,10 @@ const latestProjectTitle = latestPost
 			aria-label="项目列表"
 		>
 			{renderedPosts.map(({ entry }, i) => {
-				const projectCode = projectCodeMap.get(entry.slug) ?? `PRJ.${(entry.data.published as Date).getFullYear()}.000`;
-				const status = computeStatus(entry);
 				const techStack = (entry.data.tags ?? []).slice(0, 4);
 				return (
 					<ProjectCard
 						entry={entry}
-						projectCode={projectCode}
-						status={status}
 						techStack={techStack}
 						index={i + 1}
 						style={`animation-delay: calc(var(--content-delay) + ${(i + 1) * 60}ms);`}
@@ -265,36 +120,6 @@ const latestProjectTitle = latestPost
 				);
 			})}
 		</section>
-	)}
-
-	<!-- ============================================
-	     图例 Footer
-	     ============================================ -->
-	{renderedPosts.length > 0 && (
-		<aside class="projects-legend" aria-label="图例">
-			<span class="projects-legend__label">LEGEND</span>
-			<div class="projects-legend__items">
-				<span class="projects-legend__item">
-					<span class="projects-legend__led projects-legend__led--active" aria-hidden="true"></span>
-					ACTIVE = 6 个月内活跃维护
-				</span>
-				<span class="projects-legend__item">
-					<span class="projects-legend__led projects-legend__led--deployed" aria-hidden="true"></span>
-					DEPLOYED = 2 年内已交付
-				</span>
-				<span class="projects-legend__item">
-					<span class="projects-legend__led projects-legend__led--archived" aria-hidden="true"></span>
-					ARCHIVED = 长期归档
-				</span>
-				<span class="projects-legend__item">
-					<span class="projects-legend__led projects-legend__led--draft" aria-hidden="true"></span>
-					DRAFT = 草稿状态
-				</span>
-				<span class="projects-legend__item projects-legend__item--hint">
-					PRJ.编号 = 按年份 + 序号生成　|　技术栈 = 来自文章 tags
-				</span>
-			</div>
-		</aside>
 	)}
 </div>
 
@@ -309,14 +134,10 @@ const latestProjectTitle = latestPost
 		--display: "Syne", "Noto Serif SC", "Source Han Serif SC", serif;
 		--accent: var(--primary);
 		--blueprint-line: oklch(0.55 0.02 var(--hue) / 0.18);
-		--blueprint-active: oklch(0.78 0.16 220);
-		--blueprint-deployed: oklch(0.72 0.18 145);
-		--blueprint-archived: oklch(0.55 0.02 var(--hue));
-		--blueprint-draft: oklch(0.72 0.18 65);
 
 		display: flex;
 		flex-direction: column;
-		gap: 1.25rem;
+		gap: 1.75rem;
 	}
 
 	/* ============================================
@@ -326,7 +147,7 @@ const latestProjectTitle = latestPost
 		position: relative;
 		overflow: hidden;
 		border-radius: var(--radius-large);
-		padding: 3rem 2.5rem 2rem;
+		padding: 4rem 2.5rem 3rem;
 		background:
 			linear-gradient(
 				135deg,
@@ -358,7 +179,7 @@ const latestProjectTitle = latestPost
 		to { opacity: 1; transform: translateY(0); }
 	}
 
-	/* 栅格背景层 */
+	/* 栅格背景层（双层叠加：24px 细 + 120px 粗） */
 	.projects-hero__grid {
 		position: absolute;
 		inset: 0;
@@ -403,112 +224,19 @@ const latestProjectTitle = latestPost
 	.projects-hero__corner--br::before { bottom: 0; right: 0; width: 100%; height: 2px; }
 	.projects-hero__corner--br::after { bottom: 0; right: 0; width: 2px; height: 100%; }
 
-	/* 坐标轴线（Hero 内部辅助线） */
-	.projects-hero__axis--x {
-		position: absolute;
-		left: 5%;
-		right: 5%;
-		top: 50%;
-		height: 1px;
-		background: linear-gradient(
-			90deg,
-			transparent 0%,
-			oklch(0.5 0.02 var(--hue) / 0.18) 30%,
-			oklch(0.5 0.02 var(--hue) / 0.18) 70%,
-			transparent 100%
-		);
-		pointer-events: none;
-		opacity: 0.4;
-	}
-
-	.projects-hero__axis--y {
-		position: absolute;
-		top: 12%;
-		bottom: 12%;
-		left: 50%;
-		width: 1px;
-		background: linear-gradient(
-			180deg,
-			transparent 0%,
-			oklch(0.5 0.02 var(--hue) / 0.18) 30%,
-			oklch(0.5 0.02 var(--hue) / 0.18) 70%,
-			transparent 100%
-		);
-		pointer-events: none;
-		opacity: 0.4;
-	}
-
-	/* 扫描线动画 */
-	.projects-hero__scanline {
-		position: absolute;
-		left: 0;
-		right: 0;
-		top: 0;
-		height: 2px;
-		background: linear-gradient(
-			90deg,
-			transparent 0%,
-			var(--accent) 50%,
-			transparent 100%
-		);
-		opacity: 0.5;
-		pointer-events: none;
-		animation: scanline 4s ease-in-out infinite;
-	}
-
-	@keyframes scanline {
-		0% { transform: translateY(0); }
-		50% { transform: translateY(420px); }
-		100% { transform: translateY(0); }
-	}
-
 	.projects-hero__inner {
 		position: relative;
 		z-index: 1;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 1.125rem;
+		gap: 1.5rem;
 		text-align: center;
-	}
-
-	/* Eyebrow */
-	.projects-hero__eyebrow {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.875rem;
-		font-family: var(--mono);
-		font-size: 0.6875rem;
-		font-weight: 700;
-		letter-spacing: 0.2em;
-		color: oklch(0.5 0.04 var(--hue));
-	}
-
-	:root.dark .projects-hero__eyebrow {
-		color: oklch(0.7 0.04 var(--hue));
-	}
-
-	.projects-hero__rule {
-		display: inline-block;
-		width: 2rem;
-		height: 1px;
-		background: currentColor;
-		opacity: 0.6;
-	}
-
-	.projects-hero__eyebrow-text {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
-	.projects-hero__eyebrow-sep {
-		opacity: 0.4;
 	}
 
 	/* 主标题 */
 	.projects-hero__title {
-		margin: 0.5rem 0 0;
+		margin: 0;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -529,7 +257,7 @@ const latestProjectTitle = latestPost
 
 	.projects-hero__title-zh {
 		font-family: var(--display);
-		font-size: clamp(3rem, 1.5rem + 6vw, 5.5rem);
+		font-size: clamp(2.5rem, 1.2rem + 5vw, 4.5rem);
 		font-weight: 800;
 		letter-spacing: 0.12em;
 		background: linear-gradient(
@@ -571,15 +299,15 @@ const latestProjectTitle = latestPost
 		margin: 0 0.25rem;
 	}
 
-	/* 数据条（specs） */
+	/* 数据条（3 项） */
 	.projects-hero__specs {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
 		justify-content: center;
 		gap: 0.625rem 0.875rem;
-		margin-top: 0.5rem;
-		padding: 0.875rem 1.25rem;
+		margin-top: 1rem;
+		padding: 1rem 1.5rem;
 		border-top: 1px dashed oklch(0.5 0.02 var(--hue) / 0.3);
 		border-bottom: 1px dashed oklch(0.5 0.02 var(--hue) / 0.3);
 		font-family: var(--mono);
@@ -615,133 +343,9 @@ const latestProjectTitle = latestPost
 		color: oklch(0.88 0.02 var(--hue));
 	}
 
-	.projects-hero__spec-value--small {
-		font-size: 0.875rem;
-	}
-
-	.projects-hero__spec-unit {
-		font-size: 0.6875rem;
-		opacity: 0.6;
-	}
-
 	.projects-hero__spec-sep {
 		color: oklch(0.55 0.02 var(--hue));
 		opacity: 0.3;
-	}
-
-	/* 状态 LED 条 */
-	.projects-hero__status {
-		display: inline-flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		gap: 0.5rem 1rem;
-		padding: 0.625rem 1rem;
-		border-radius: 2px;
-		background: oklch(0.5 0.02 var(--hue) / 0.05);
-		border: 1px solid oklch(0.5 0.02 var(--hue) / 0.15);
-		font-family: var(--mono);
-		font-size: 0.6875rem;
-	}
-
-	:root.dark .projects-hero__status {
-		background: oklch(1 0 0 / 0.03);
-		border-color: oklch(0.7 0.02 var(--hue) / 0.18);
-	}
-
-	.projects-hero__status-item {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.375rem;
-	}
-
-	.projects-hero__led {
-		width: 8px;
-		height: 8px;
-		border-radius: 50%;
-		flex-shrink: 0;
-	}
-
-	.projects-hero__led--active {
-		background: var(--blueprint-active);
-		box-shadow: 0 0 0 0 var(--blueprint-active);
-		animation: heroLedPulse 2.4s ease-in-out infinite;
-	}
-
-	.projects-hero__led--deployed {
-		background: var(--blueprint-deployed);
-	}
-
-	.projects-hero__led--archived {
-		background: var(--blueprint-archived);
-	}
-
-	.projects-hero__led--draft {
-		background: var(--blueprint-draft);
-	}
-
-	@keyframes heroLedPulse {
-		0%, 100% {
-			box-shadow: 0 0 0 0 color-mix(in oklch, var(--blueprint-active) 50%, transparent);
-		}
-		50% {
-			box-shadow: 0 0 0 5px color-mix(in oklch, var(--blueprint-active) 0%, transparent);
-		}
-	}
-
-	.projects-hero__status-text {
-		color: oklch(0.5 0.02 var(--hue));
-		letter-spacing: 0.06em;
-	}
-
-	:root.dark .projects-hero__status-text {
-		color: oklch(0.72 0.02 var(--hue));
-	}
-
-	.projects-hero__status-num {
-		font-weight: 800;
-		margin-left: 0.25rem;
-		color: var(--accent);
-	}
-
-	/* 最新项目引用 */
-	.projects-hero__latest {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.4375rem 0.875rem;
-		border-radius: 2px;
-		background: oklch(0.5 0.02 var(--hue) / 0.05);
-		font-family: var(--mono);
-		font-size: 0.75rem;
-		max-width: 100%;
-	}
-
-	:root.dark .projects-hero__latest {
-		background: oklch(1 0 0 / 0.04);
-	}
-
-	.projects-hero__latest-icon {
-		font-size: 1rem;
-		color: var(--accent);
-	}
-
-	.projects-hero__latest-label {
-		font-weight: 800;
-		letter-spacing: 0.14em;
-		color: var(--accent);
-	}
-
-	.projects-hero__latest-title {
-		color: oklch(0.4 0.02 var(--hue));
-		font-weight: 500;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		max-width: 28rem;
-	}
-
-	:root.dark .projects-hero__latest-title {
-		color: oklch(0.78 0.02 var(--hue));
 	}
 
 	/* ============================================
@@ -768,12 +372,12 @@ const latestProjectTitle = latestPost
 	}
 
 	/* ============================================
-	   网格
+	   网格（限定 2 列）
 	   ============================================ */
 	.projects-grid {
 		display: grid;
 		grid-template-columns: 1fr;
-		gap: 1.25rem;
+		gap: 1.5rem;
 	}
 
 	@media (min-width: 768px) {
@@ -782,100 +386,12 @@ const latestProjectTitle = latestPost
 		}
 	}
 
-	@media (min-width: 1280px) {
-		.projects-grid {
-			grid-template-columns: repeat(3, 1fr);
-		}
-	}
-
-	/* ============================================
-	   图例 Footer
-	   ============================================ */
-	.projects-legend {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 0.625rem 1rem;
-		padding: 1rem 1.25rem;
-		border-radius: var(--radius-large);
-		background: var(--card-bg);
-		border: 1px dashed oklch(0.5 0.02 var(--hue) / 0.2);
-		font-family: var(--mono);
-		font-size: 0.6875rem;
-	}
-
-	:root.dark .projects-legend {
-		border-color: oklch(0.7 0.02 var(--hue) / 0.25);
-	}
-
-	.projects-legend__label {
-		font-weight: 800;
-		letter-spacing: 0.18em;
-		color: var(--accent);
-	}
-
-	.projects-legend__items {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 0.5rem 1rem;
-		color: oklch(0.5 0.02 var(--hue));
-	}
-
-	:root.dark .projects-legend__items {
-		color: oklch(0.72 0.02 var(--hue));
-	}
-
-	.projects-legend__item {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.375rem;
-		letter-spacing: 0.04em;
-	}
-
-	.projects-legend__item--hint {
-		opacity: 0.7;
-		padding-left: 0.5rem;
-		border-left: 1px solid oklch(0.5 0.02 var(--hue) / 0.2);
-	}
-
-	:root.dark .projects-legend__item--hint {
-		border-left-color: oklch(0.7 0.02 var(--hue) / 0.2);
-	}
-
-	.projects-legend__led {
-		width: 6px;
-		height: 6px;
-		border-radius: 50%;
-		flex-shrink: 0;
-	}
-
-	.projects-legend__led--active {
-		background: var(--blueprint-active);
-	}
-
-	.projects-legend__led--deployed {
-		background: var(--blueprint-deployed);
-	}
-
-	.projects-legend__led--archived {
-		background: var(--blueprint-archived);
-	}
-
-	.projects-legend__led--draft {
-		background: var(--blueprint-draft);
-	}
-
 	/* ============================================
 	   移动端
 	   ============================================ */
 	@media (max-width: 768px) {
 		.projects-hero {
-			padding: 2rem 1.25rem 1.5rem;
-		}
-		.projects-hero__axis--x,
-		.projects-hero__axis--y {
-			display: none;
+			padding: 2.5rem 1.25rem 2rem;
 		}
 		.projects-hero__corner {
 			width: 20px;
@@ -887,14 +403,5 @@ const latestProjectTitle = latestPost
 		.projects-hero__spec-value {
 			font-size: 0.9375rem;
 		}
-		.projects-hero__status {
-			gap: 0.5rem;
-		}
-	}
-
-	@keyframes scanline {
-		0% { transform: translateY(0); }
-		50% { transform: translateY(360px); }
-		100% { transform: translateY(0); }
 	}
 </style>
