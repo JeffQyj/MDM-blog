@@ -71,6 +71,12 @@ importers:
       astro-icon:
         specifier: ^1.1.5
         version: 1.1.5
+      cytoscape:
+        specifier: ^3.33.3
+        version: 3.33.3
+      cytoscape-fcose:
+        specifier: ^2.2.0
+        version: 2.2.0(cytoscape@3.33.3)
       hastscript:
         specifier: ^9.0.1
         version: 9.0.1

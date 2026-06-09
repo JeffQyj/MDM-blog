@@ -8,6 +8,7 @@ export const zh_TW: Translation = {
 	[Key.featured]: "精選",
 	[Key.projects]: "專案",
 	[Key.search]: "搜尋",
+	[Key.tech]: "技術",
 
 	[Key.tags]: "標籤",
 	[Key.categories]: "分類",

@@ -8,6 +8,7 @@ export const ko: Translation = {
 	[Key.featured]: "추천",
 	[Key.projects]: "프로젝트",
 	[Key.search]: "검색",
+	[Key.tech]: "기술",
 
 	[Key.tags]: "태그",
 	[Key.categories]: "카테고리",
