@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { TechCategory, TechEntry } from "@/types/tech";
 import { type PostIndex, resolveRelatedPosts } from "@/utils/tech-page-utils";
+import type { Action } from "svelte/action";
 
 type Props = {
 	category: TechCategory;
@@ -57,6 +58,18 @@ let popoverPos = $state<PopoverPos>({ x: 0, y: 0, placement: "right" });
 const POPOVER_WIDTH = 320;
 const POPOVER_GAP = 14;
 const POPOVER_MARGIN = 8;
+
+// 把弹窗 portal 到 body，避免被祖先 transform/filter 约束 fixed 定位
+//（#content-wrapper 的 .onload-animation 动画末态 transform: translateY(0)
+//  会创建新的包含块，导致 fixed 弹窗相对 #content-wrapper 而非视口定位）
+const portal: Action<HTMLElement> = (node) => {
+	document.body.appendChild(node);
+	return {
+		destroy() {
+			node.remove();
+		},
+	};
+};
 
 // 计算弹窗位置（避免超出视口）
 function calcPosition(anchor: HTMLElement): PopoverPos {
@@ -178,6 +191,7 @@ const activePostList = $derived(
 
 {#if activeNode}
 	<div
+		use:portal
 		class="cat-popover"
 		class:cat-popover--left={popoverPos.placement === "left"}
 		class:cat-popover--bottom={popoverPos.placement === "bottom"}

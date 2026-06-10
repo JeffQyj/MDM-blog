@@ -654,17 +654,12 @@ const blocks = TECH_CATEGORY_ORDER.map((cat) => ({
 
 	/* ============================================
 	   分类区块容器（统一动画 + 入场效果）
+	   一列展示：避免两列布局导致的卡片高低不平
 	   ============================================ */
 	.tech-blocks {
 		display: grid;
 		grid-template-columns: 1fr;
 		gap: 1rem;
-	}
-
-	@media (min-width: 1024px) {
-		.tech-blocks {
-			grid-template-columns: repeat(2, 1fr);
-		}
 	}
 
 	.tech-block-wrapper {
