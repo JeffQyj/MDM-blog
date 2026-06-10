@@ -65,6 +65,113 @@ const latestDateText = latestDate
 			<span class="bookshelf-hero__spark bookshelf-hero__spark--2" aria-hidden="true">✦</span>
 			<span class="bookshelf-hero__spark bookshelf-hero__spark--3" aria-hidden="true">✦</span>
 
+			<!-- 装饰：云朵（右上角，主云 + 内部小星 + 周边点缀） -->
+			<svg
+				class="bookshelf-hero__cloud bookshelf-hero__cloud--tr"
+				viewBox="0 0 120 80"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.6"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<!-- 主云朵外轮廓 -->
+				<path d="M 24 64
+					C 12 64, 6 52, 16 44
+					C 10 30, 26 18, 38 26
+					C 44 12, 68 12, 74 26
+					C 90 18, 106 32, 98 46
+					C 112 52, 106 66, 92 64
+					Z" />
+				<!-- 云内小星 -->
+				<g class="bookshelf-hero__cloud-star">
+					<path d="M 52 36 L 54 42 L 60 44 L 54 46 L 52 52 L 50 46 L 44 44 L 50 42 Z" fill="currentColor" stroke="none" />
+				</g>
+				<!-- 周边小圆点 -->
+				<circle cx="6" cy="28" r="1.4" fill="currentColor" stroke="none" />
+				<circle cx="112" cy="22" r="1.2" fill="currentColor" stroke="none" />
+				<circle cx="14" cy="74" r="1" fill="currentColor" stroke="none" />
+			</svg>
+
+			<!-- 装饰：云朵（左下角，小云轨迹） -->
+			<svg
+				class="bookshelf-hero__cloud bookshelf-hero__cloud--bl"
+				viewBox="0 0 80 50"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.4"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<!-- 小云朵轮廓 -->
+				<path d="M 18 40
+					C 10 40, 6 32, 14 26
+					C 10 16, 22 8, 30 14
+					C 36 4, 54 4, 58 14
+					C 70 8, 78 22, 70 30
+					C 76 36, 70 42, 62 40
+					Z" />
+				<!-- 下方小点 -->
+				<circle cx="10" cy="46" r="0.9" fill="currentColor" stroke="none" />
+				<circle cx="20" cy="48" r="0.7" fill="currentColor" stroke="none" />
+			</svg>
+
+			<!-- 装饰：书本（顶部左侧，单本立式书） -->
+			<svg
+				class="bookshelf-hero__book bookshelf-hero__book--tl"
+				viewBox="0 0 60 80"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.6"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<!-- 封面外框 -->
+				<rect x="8" y="6" width="44" height="68" rx="2" />
+				<!-- 书脊分隔线 -->
+				<line x1="14" y1="6" x2="14" y2="74" />
+				<!-- 内框（标题区） -->
+				<rect x="20" y="16" width="20" height="22" />
+				<!-- 标题装饰线 -->
+				<line x1="24" y1="22" x2="36" y2="22" />
+				<line x1="24" y1="28" x2="36" y2="28" />
+				<line x1="26" y1="34" x2="34" y2="34" />
+				<!-- 下方装饰横线（拟页脚 / 作者） -->
+				<line x1="24" y1="50" x2="36" y2="50" />
+				<line x1="26" y1="56" x2="34" y2="56" />
+				<line x1="28" y1="62" x2="32" y2="62" />
+			</svg>
+
+			<!-- 装饰：书堆（底部右侧，三本横放叠摞） -->
+			<svg
+				class="bookshelf-hero__book bookshelf-hero__book--br"
+				viewBox="0 0 80 60"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.4"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<!-- 底层书（最宽） -->
+				<rect x="6" y="44" width="68" height="12" rx="1.5" />
+				<line x1="10" y1="44" x2="10" y2="56" />
+				<line x1="70" y1="44" x2="70" y2="56" />
+				<!-- 中间书 -->
+				<rect x="12" y="30" width="56" height="12" rx="1.5" />
+				<line x1="16" y1="30" x2="16" y2="42" />
+				<line x1="64" y1="30" x2="64" y2="42" />
+				<!-- 上层书（最窄） -->
+				<rect x="20" y="16" width="42" height="12" rx="1.5" />
+				<line x1="24" y1="16" x2="24" y2="28" />
+				<line x1="58" y1="16" x2="58" y2="28" />
+				<!-- 上层书上的书签线 -->
+				<line x1="40" y1="10" x2="40" y2="16" />
+			</svg>
+
 			<div class="bookshelf-hero__inner">
 				<!-- 顶部小帽 -->
 				<div class="bookshelf-hero__eyebrow">
@@ -274,6 +381,95 @@ const latestDateText = latestDate
 	.bookshelf-hero__corner--br { bottom: 16px; right: 16px; }
 	.bookshelf-hero__corner--br::before { bottom: 0; right: 0; width: 100%; height: 2px; }
 	.bookshelf-hero__corner--br::after  { bottom: 0; right: 0; width: 2px; height: 100%; }
+
+	/* ============================================
+	   装饰：云朵（手绘描边 + 内部小星 / 飞溅小点）
+	   ============================================ */
+	.bookshelf-hero__cloud {
+		position: absolute;
+		pointer-events: none;
+		z-index: 1;
+		transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.bookshelf-hero__cloud--tr {
+		top: 28px;
+		right: 100px;
+		width: 96px;
+		height: 64px;
+		color: var(--gold-deep);
+		opacity: 0.55;
+		transform: rotate(-4deg);
+	}
+
+	.bookshelf-hero__cloud--bl {
+		bottom: 40px;
+		left: 50px;
+		width: 64px;
+		height: 40px;
+		color: var(--gold);
+		opacity: 0.45;
+		transform: rotate(8deg);
+	}
+
+	/* 云内小星：微微脉动 */
+	.bookshelf-hero__cloud-star {
+		transform-origin: 52px 44px;
+		animation: bookshelfCloudStar 3s ease-in-out infinite;
+	}
+
+	@keyframes bookshelfCloudStar {
+		0%, 100% { opacity: 1; transform: scale(1); }
+		50% { opacity: 0.65; transform: scale(0.85); }
+	}
+
+	.bookshelf-hero:hover .bookshelf-hero__cloud--tr {
+		opacity: 0.8;
+		transform: rotate(-1deg) translate(2px, -1px);
+	}
+	.bookshelf-hero:hover .bookshelf-hero__cloud--bl {
+		opacity: 0.65;
+		transform: rotate(5deg) translate(-2px, 1px);
+	}
+
+	/* ============================================
+	   装饰：书本（立式单本 / 横放书堆）
+	   ============================================ */
+	.bookshelf-hero__book {
+		position: absolute;
+		pointer-events: none;
+		z-index: 1;
+		transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.bookshelf-hero__book--tl {
+		top: 36px;
+		left: 80px;
+		width: 48px;
+		height: 64px;
+		color: var(--gold-deep);
+		opacity: 0.5;
+		transform: rotate(-8deg);
+	}
+
+	.bookshelf-hero__book--br {
+		bottom: 36px;
+		right: 80px;
+		width: 72px;
+		height: 54px;
+		color: var(--gold);
+		opacity: 0.45;
+		transform: rotate(6deg);
+	}
+
+	.bookshelf-hero:hover .bookshelf-hero__book--tl {
+		opacity: 0.75;
+		transform: rotate(-5deg) translate(-2px, -1px);
+	}
+	.bookshelf-hero:hover .bookshelf-hero__book--br {
+		opacity: 0.65;
+		transform: rotate(3deg) translate(2px, 1px);
+	}
 
 	/* 金色 ✦ 星点 */
 	.bookshelf-hero__spark {
@@ -498,6 +694,10 @@ const latestDateText = latestDate
 			height: 20px;
 		}
 		.bookshelf-hero__spark {
+			display: none;
+		}
+		.bookshelf-hero__cloud,
+		.bookshelf-hero__book {
 			display: none;
 		}
 		.bookshelf-hero__meta {
