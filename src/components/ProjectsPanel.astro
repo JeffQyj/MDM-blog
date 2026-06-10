@@ -29,116 +29,153 @@ const secondaryCount = renderedPosts.filter(
 
 <div class="projects-page">
 	<!-- ============================================
-	     Hero 英雄区（精简版：标题 + 副标题 + 3 项数据 + 铅笔点缀 + 金色描边）
+	     Hero 英雄区（蓝图纸 + 铅笔 + 墨水 + 标题 + 副标题 + 数据条）
 	     ============================================ -->
-	<section
-		class="projects-hero"
-		style="animation-delay: calc(var(--content-delay) + 0ms);"
-	>
-		<!-- 栅格背景层 -->
-		<div class="projects-hero__grid" aria-hidden="true"></div>
-
-		<!-- 装饰：手绘铅笔（左上角，金色描边） -->
-		<svg
-			class="projects-hero__pencil projects-hero__pencil--tl"
-			viewBox="0 0 64 64"
-			fill="none"
-			stroke="currentColor"
-			stroke-width="1.6"
-			stroke-linecap="round"
-			stroke-linejoin="round"
-			aria-hidden="true"
+	{posts.length > 0 && (
+		<section
+			class="projects-hero"
+			style="animation-delay: calc(var(--content-delay) + 0ms);"
 		>
-			<!-- 笔尖三角 -->
-			<path d="M6 58 L22 42" />
-			<!-- 笔尖分隔线 -->
-			<path d="M16 48 L22 42 L28 48" />
-			<!-- 笔杆 -->
-			<path d="M22 42 L46 18" />
-			<path d="M28 48 L52 24" />
-			<!-- 笔尾橡皮/金属箍 -->
-			<path d="M46 18 L52 24 L58 18 L52 12 Z" />
-			<path d="M52 12 L58 18" />
-		</svg>
+			<!-- 装饰层：蓝图纸栅格背景 -->
+			<div class="projects-hero__grid" aria-hidden="true"></div>
 
-		<!-- 装饰：手绘铅笔（右下角，镜像旋转，金色描边） -->
-		<svg
-			class="projects-hero__pencil projects-hero__pencil--br"
-			viewBox="0 0 64 64"
-			fill="none"
-			stroke="currentColor"
-			stroke-width="1.6"
-			stroke-linecap="round"
-			stroke-linejoin="round"
-			aria-hidden="true"
-		>
-			<path d="M6 58 L22 42" />
-			<path d="M16 48 L22 42 L28 48" />
-			<path d="M22 42 L46 18" />
-			<path d="M28 48 L52 24" />
-			<path d="M46 18 L52 24 L58 18 L52 12 Z" />
-			<path d="M52 12 L58 18" />
-		</svg>
-
-		<!-- 金色 ✦ 星点点缀 -->
-		<span class="projects-hero__spark projects-hero__spark--1" aria-hidden="true">✦</span>
-		<span class="projects-hero__spark projects-hero__spark--2" aria-hidden="true">✦</span>
-		<span class="projects-hero__spark projects-hero__spark--3" aria-hidden="true">✦</span>
-
-		<!-- 四角 ┌ ┐ └ ┘ 装饰 -->
-		<span class="projects-hero__corner projects-hero__corner--tl" aria-hidden="true"></span>
-		<span class="projects-hero__corner projects-hero__corner--tr" aria-hidden="true"></span>
-		<span class="projects-hero__corner projects-hero__corner--bl" aria-hidden="true"></span>
-		<span class="projects-hero__corner projects-hero__corner--br" aria-hidden="true"></span>
-
-		<div class="projects-hero__inner">
-			<!-- 顶部小帽（手绘双线 + 文本） -->
-			<div class="projects-hero__eyebrow">
-				<span class="projects-hero__rule"></span>
-				<span class="projects-hero__eyebrow-text">PORTFOLIO · 作品集</span>
-				<span class="projects-hero__rule"></span>
-			</div>
-
-			<!-- 主标题 -->
-			<h1 class="projects-hero__title">
-				<span class="projects-hero__title-en">Projects</span>
-				<span class="projects-hero__title-zh">项　目</span>
-			</h1>
-
-			<!-- 手绘金色下划线（铅笔勾线笔触） -->
+			<!-- 装饰：手绘铅笔（左上角，金色描边） -->
 			<svg
-				class="projects-hero__underline"
-				viewBox="0 0 220 14"
+				class="projects-hero__pencil projects-hero__pencil--tl"
+				viewBox="0 0 64 64"
 				fill="none"
+				stroke="currentColor"
+				stroke-width="1.6"
+				stroke-linecap="round"
+				stroke-linejoin="round"
 				aria-hidden="true"
 			>
-				<path
-					d="M4 9 Q 50 3, 100 7 T 216 6"
-					stroke="currentColor"
-					stroke-width="1.8"
-					stroke-linecap="round"
-				/>
+				<!-- 笔尖三角 -->
+				<path d="M6 58 L22 42" />
+				<!-- 笔尖分隔线 -->
+				<path d="M16 48 L22 42 L28 48" />
+				<!-- 笔杆 -->
+				<path d="M22 42 L46 18" />
+				<path d="M28 48 L52 24" />
+				<!-- 笔尾橡皮/金属箍 -->
+				<path d="M46 18 L52 24 L58 18 L52 12 Z" />
+				<path d="M52 12 L58 18" />
 			</svg>
 
-			<!-- 关键数据条（3 项，数值采用金色渐变） -->
-			<div class="projects-hero__specs">
-				<div class="projects-hero__spec">
-					<span class="projects-hero__spec-label">TOTAL</span>
-					<span class="projects-hero__spec-value">{totalCount}</span>
+			<!-- 装饰：手绘铅笔（右下角，镜像旋转，金色描边） -->
+			<svg
+				class="projects-hero__pencil projects-hero__pencil--br"
+				viewBox="0 0 64 64"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.6"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<path d="M6 58 L22 42" />
+				<path d="M16 48 L22 42 L28 48" />
+				<path d="M22 42 L46 18" />
+				<path d="M28 48 L52 24" />
+				<path d="M46 18 L52 24 L58 18 L52 12 Z" />
+				<path d="M52 12 L58 18" />
+			</svg>
+
+			<!-- 装饰：墨水（右上角，水滴 + 飞溅小点） -->
+			<svg
+				class="projects-hero__ink projects-hero__ink--tr"
+				viewBox="0 0 96 96"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.6"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<!-- 墨滴主体（水滴形） -->
+				<path d="M48 14 C 32 38, 24 52, 24 64 A 24 24 0 0 0 72 64 C 72 52, 64 38, 48 14 Z" />
+				<!-- 墨滴高光 -->
+				<ellipse cx="40" cy="54" rx="3" ry="6" />
+				<!-- 飞溅小点 1（右上） -->
+				<circle cx="82" cy="26" r="2.4" fill="currentColor" stroke="none" />
+				<!-- 飞溅小点 2（右中） -->
+				<circle cx="86" cy="42" r="1.6" fill="currentColor" stroke="none" />
+				<!-- 飞溅小点 3（左侧） -->
+				<circle cx="14" cy="44" r="1.8" fill="currentColor" stroke="none" />
+				<!-- 飞溅小点 4（左下） -->
+				<circle cx="20" cy="80" r="1.2" fill="currentColor" stroke="none" />
+			</svg>
+
+			<!-- 装饰：墨水（左侧中部，小水滴轨迹） -->
+			<svg
+				class="projects-hero__ink projects-hero__ink--ml"
+				viewBox="0 0 48 80"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.4"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<!-- 主体小水滴 -->
+				<path d="M24 6 C 18 18, 14 26, 14 32 A 10 10 0 0 0 34 32 C 34 26, 30 18, 24 6 Z" />
+				<!-- 下方飞溅点 -->
+				<circle cx="24" cy="52" r="1.6" fill="currentColor" stroke="none" />
+				<circle cx="30" cy="62" r="1.2" fill="currentColor" stroke="none" />
+				<circle cx="18" cy="68" r="1" fill="currentColor" stroke="none" />
+				<circle cx="26" cy="74" r="0.8" fill="currentColor" stroke="none" />
+			</svg>
+
+			<!-- 金色 ✦ 星点点缀 -->
+			<span class="projects-hero__spark projects-hero__spark--1" aria-hidden="true">✦</span>
+			<span class="projects-hero__spark projects-hero__spark--2" aria-hidden="true">✦</span>
+			<span class="projects-hero__spark projects-hero__spark--3" aria-hidden="true">✦</span>
+
+			<!-- 四角 ┌ ┐ └ ┘ 装饰 -->
+			<span class="projects-hero__corner projects-hero__corner--tl" aria-hidden="true"></span>
+			<span class="projects-hero__corner projects-hero__corner--tr" aria-hidden="true"></span>
+			<span class="projects-hero__corner projects-hero__corner--bl" aria-hidden="true"></span>
+			<span class="projects-hero__corner projects-hero__corner--br" aria-hidden="true"></span>
+
+			<div class="projects-hero__inner">
+				<!-- 顶部小帽 -->
+				<div class="projects-hero__eyebrow">
+					<span class="projects-hero__rule"></span>
+					<span class="projects-hero__eyebrow-text">PORTFOLIO · 作品集</span>
+					<span class="projects-hero__rule"></span>
 				</div>
-				<span class="projects-hero__spec-sep" aria-hidden="true">│</span>
-				<div class="projects-hero__spec">
-					<span class="projects-hero__spec-label">独立项目</span>
-					<span class="projects-hero__spec-value">{independentCount}</span>
-				</div>
-				<span class="projects-hero__spec-sep" aria-hidden="true">│</span>
-				<div class="projects-hero__spec">
-					<span class="projects-hero__spec-label">二次开发</span>
-					<span class="projects-hero__spec-value">{secondaryCount}</span>
+
+				<!-- 巨型主标题 -->
+				<h1 class="projects-hero__title">
+					<span class="projects-hero__title-en">Projects</span>
+					<span class="projects-hero__title-zh">项　目</span>
+				</h1>
+
+				<!-- 副标题 -->
+				<p class="projects-hero__subtitle">
+					认真打磨每一行，只为呈现最完美
+				</p>
+
+				<!-- 数据条（3 项：项目总数 / 独立项目 / 二次开发） -->
+				<div class="projects-hero__meta">
+					<span class="projects-hero__meta-item">
+						<span class="projects-hero__meta-label">TOTAL</span>
+						<span class="projects-hero__meta-value">{totalCount}</span>
+					</span>
+					<span class="projects-hero__meta-dot" aria-hidden="true">·</span>
+					<span class="projects-hero__meta-item">
+						<span class="projects-hero__meta-label">独立项目</span>
+						<span class="projects-hero__meta-value">{independentCount}</span>
+					</span>
+					<span class="projects-hero__meta-dot" aria-hidden="true">·</span>
+					<span class="projects-hero__meta-item">
+						<span class="projects-hero__meta-label">二次开发</span>
+						<span class="projects-hero__meta-value">{secondaryCount}</span>
+					</span>
 				</div>
 			</div>
-		</div>
-	</section>
+		</section>
+	)}
 
 	<!-- ============================================
 	     筛选条
@@ -197,6 +234,9 @@ const secondaryCount = renderedPosts.filter(
 			"JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Monaco,
 			Consolas, "Liberation Mono", "Courier New", monospace;
 		--display: "Syne", "Noto Serif SC", "Source Han Serif SC", serif;
+		--serif:
+			"Source Han Serif SC", "Noto Serif SC", "Songti SC",
+			"STSong", "SimSun", "Georgia", serif;
 		--accent: var(--primary);
 		--blueprint-line: oklch(0.55 0.02 var(--hue) / 0.18);
 
@@ -249,7 +289,7 @@ const secondaryCount = renderedPosts.filter(
 		to { opacity: 1; transform: translateY(0); }
 	}
 
-	/* 栅格背景层（双层叠加：24px 细 + 120px 粗） */
+	/* 蓝图纸栅格背景层（双层叠加：24px 细 + 120px 粗） */
 	.projects-hero__grid {
 		position: absolute;
 		inset: 0;
@@ -332,6 +372,45 @@ const secondaryCount = renderedPosts.filter(
 	}
 
 	/* ============================================
+	   装饰：墨水（水滴 + 飞溅小点）
+	   ============================================ */
+	.projects-hero__ink {
+		position: absolute;
+		pointer-events: none;
+		z-index: 1;
+		transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.projects-hero__ink--tr {
+		top: 30px;
+		right: 100px;
+		width: 72px;
+		height: 72px;
+		color: var(--gold-deep);
+		opacity: 0.5;
+		transform: rotate(8deg);
+	}
+
+	.projects-hero__ink--ml {
+		top: 50%;
+		left: 40px;
+		width: 36px;
+		height: 60px;
+		color: var(--gold);
+		opacity: 0.42;
+		transform: translateY(-50%) rotate(-15deg);
+	}
+
+	.projects-hero:hover .projects-hero__ink--tr {
+		opacity: 0.75;
+		transform: rotate(12deg) translate(2px, 2px);
+	}
+	.projects-hero:hover .projects-hero__ink--ml {
+		opacity: 0.6;
+		transform: translateY(-50%) rotate(-10deg) translate(2px, 0);
+	}
+
+	/* ============================================
 	   装饰：金色 ✦ 星点
 	   ============================================ */
 	.projects-hero__spark {
@@ -345,25 +424,25 @@ const secondaryCount = renderedPosts.filter(
 	}
 
 	.projects-hero__spark--1 {
-		top: 38px;
-		right: 130px;
+		top: 40px;
+		right: 80px;
 		font-size: 1.5rem;
-		opacity: 0.7;
+		opacity: 0.75;
 		transform: rotate(15deg);
 	}
 
 	.projects-hero__spark--2 {
-		bottom: 52px;
-		left: 140px;
+		bottom: 56px;
+		left: 100px;
 		font-size: 1.125rem;
 		opacity: 0.6;
-		transform: rotate(-10deg);
+		transform: rotate(-12deg);
 		color: var(--gold-light);
 	}
 
 	.projects-hero__spark--3 {
 		top: 50%;
-		right: 50px;
+		right: 40px;
 		font-size: 0.875rem;
 		opacity: 0.55;
 		transform: translateY(-50%) rotate(20deg);
@@ -375,12 +454,12 @@ const secondaryCount = renderedPosts.filter(
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 1.5rem;
+		gap: 1rem;
 		text-align: center;
 	}
 
 	/* ============================================
-	   顶部小帽：手绘双线 + 文本（呼应精选页）
+	   顶部小帽：手绘双线 + 文本
 	   ============================================ */
 	.projects-hero__eyebrow {
 		display: inline-flex;
@@ -406,57 +485,38 @@ const secondaryCount = renderedPosts.filter(
 		);
 	}
 
-	/* 手绘金色下划线（铅笔勾线笔触） */
-	.projects-hero__underline {
-		display: block;
-		width: clamp(160px, 18vw, 220px);
-		height: 14px;
-		color: var(--gold);
-		opacity: 0.85;
-		margin-top: -0.5rem;
-	}
-
 	/* 主标题 */
 	.projects-hero__title {
-		margin: 0;
+		margin: 0.25rem 0 0;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 0.5rem;
+		gap: 0.25rem;
+		font-family: var(--serif);
 		line-height: 1;
 	}
 
 	.projects-hero__title-en {
-		font-family: var(--display);
-		font-size: 1rem;
+		font-family: var(--serif);
+		font-size: 0.95rem;
 		font-style: italic;
 		font-weight: 600;
-		letter-spacing: 0.32em;
+		letter-spacing: 0.3em;
 		text-transform: uppercase;
 		color: var(--accent);
-		opacity: 0.75;
+		opacity: 0.7;
 	}
 
 	.projects-hero__title-zh {
-		font-family: var(--display);
-		font-size: clamp(2.5rem, 1.2rem + 5vw, 4.5rem);
-		font-weight: 800;
+		font-family: var(--serif);
+		font-size: clamp(2.75rem, 1.5rem + 5.5vw, 5.25rem);
+		font-weight: 900;
 		letter-spacing: 0.12em;
 		background: linear-gradient(
 			180deg,
-			oklch(0.22 0.04 var(--hue)) 0%,
-			oklch(0.45 0.1 var(--hue)) 100%
-		);
-		-webkit-background-clip: text;
-		background-clip: text;
-		-webkit-text-fill-color: transparent;
-	}
-
-	:root.dark .projects-hero__title-zh {
-		background: linear-gradient(
-			180deg,
-			oklch(0.95 0.02 var(--hue)) 0%,
-			oklch(0.7 0.1 var(--hue)) 100%
+			var(--gold-deep) 0%,
+			var(--gold) 60%,
+			var(--gold-light) 100%
 		);
 		-webkit-background-clip: text;
 		background-clip: text;
@@ -466,9 +526,10 @@ const secondaryCount = renderedPosts.filter(
 	/* 副标题 */
 	.projects-hero__subtitle {
 		margin: 0;
-		font-family: var(--mono);
-		font-size: 0.8125rem;
+		font-family: var(--serif);
+		font-size: 0.95rem;
 		color: oklch(0.5 0.02 var(--hue));
+		font-weight: 400;
 		letter-spacing: 0.05em;
 	}
 
@@ -476,45 +537,39 @@ const secondaryCount = renderedPosts.filter(
 		color: oklch(0.7 0.015 var(--hue));
 	}
 
-	.projects-hero__subtitle-sep {
-		opacity: 0.4;
-		margin: 0 0.25rem;
-	}
-
 	/* 数据条（3 项） */
-	.projects-hero__specs {
-		display: flex;
-		flex-wrap: wrap;
+	.projects-hero__meta {
+		display: inline-flex;
 		align-items: center;
+		gap: 0.875rem;
+		flex-wrap: wrap;
 		justify-content: center;
-		gap: 0.625rem 0.875rem;
-		margin-top: 1rem;
-		padding: 1rem 1.5rem;
+		margin-top: 0.75rem;
+		padding-top: 1.25rem;
 		border-top: 1px dashed oklch(0.5 0.02 var(--hue) / 0.3);
-		border-bottom: 1px dashed oklch(0.5 0.02 var(--hue) / 0.3);
 		font-family: var(--mono);
 	}
 
-	.projects-hero__spec {
+	.projects-hero__meta-item {
 		display: inline-flex;
 		align-items: baseline;
-		gap: 0.4375rem;
+		gap: 0.4rem;
 	}
 
-	.projects-hero__spec-label {
+	.projects-hero__meta-label {
 		font-size: 0.625rem;
 		font-weight: 600;
 		letter-spacing: 0.16em;
 		color: oklch(0.55 0.02 var(--hue));
-		opacity: 0.75;
+		opacity: 0.7;
 	}
 
-	:root.dark .projects-hero__spec-label {
+	:root.dark .projects-hero__meta-label {
 		color: oklch(0.7 0.02 var(--hue));
 	}
 
-	.projects-hero__spec-value {
-		font-size: 1.0625rem;
+	.projects-hero__meta-value {
+		font-size: 0.95rem;
 		font-weight: 800;
 		font-feature-settings: "tnum" 1;
 		letter-spacing: 0.04em;
@@ -527,24 +582,12 @@ const secondaryCount = renderedPosts.filter(
 		-webkit-background-clip: text;
 		background-clip: text;
 		-webkit-text-fill-color: transparent;
-		color: var(--gold);
 	}
 
-	:root.dark .projects-hero__spec-value {
-		background: linear-gradient(
-			180deg,
-			var(--gold) 0%,
-			var(--gold-light) 60%,
-			oklch(0.95 0.06 90) 100%
-		);
-		-webkit-background-clip: text;
-		background-clip: text;
-		-webkit-text-fill-color: transparent;
-	}
-
-	.projects-hero__spec-sep {
-		color: oklch(0.55 0.02 var(--hue));
-		opacity: 0.3;
+	.projects-hero__meta-dot {
+		color: oklch(0.6 0.02 var(--hue));
+		opacity: 0.4;
+		font-size: 1.1rem;
 	}
 
 	/* ============================================
@@ -596,19 +639,17 @@ const secondaryCount = renderedPosts.filter(
 			width: 20px;
 			height: 20px;
 		}
-		.projects-hero__specs {
-			gap: 0.375rem 0.625rem;
+		.projects-hero__meta {
+			gap: 0.5rem;
 		}
-		.projects-hero__spec-value {
-			font-size: 0.9375rem;
-		}
-		/* 移动端隐藏铅笔/星点装饰，避免拥挤 */
-		.projects-hero__pencil,
-		.projects-hero__spark {
+		.projects-hero__meta-dot {
 			display: none;
 		}
-		.projects-hero__underline {
-			width: 140px;
+		/* 移动端隐藏铅笔/墨水/星点装饰，避免拥挤 */
+		.projects-hero__pencil,
+		.projects-hero__ink,
+		.projects-hero__spark {
+			display: none;
 		}
 	}
 </style>
