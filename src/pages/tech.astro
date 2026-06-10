@@ -48,28 +48,138 @@ const blocks = TECH_CATEGORY_ORDER.map((cat) => ({
 >
 	<div class="tech-page">
 		<!-- ============================================
-		     Hero 英雄区（沿用神经网 + 金色渐变风）
+		     Hero 英雄区（沿用书架页的轻盈金色 + Serif 风）
 		     ============================================ -->
 		<section
 			class="tech-hero"
 			style="animation-delay: calc(var(--content-delay) + 0ms);"
 		>
-			<!-- 神经网底层纹理 -->
-			<div class="tech-hero__net" aria-hidden="true"></div>
-			<div class="tech-hero__stars" aria-hidden="true">
-				<span class="tech-hero__star tech-hero__star--1">✦</span>
-				<span class="tech-hero__star tech-hero__star--2">✦</span>
-				<span class="tech-hero__star tech-hero__star--3">·</span>
-				<span class="tech-hero__star tech-hero__star--4">·</span>
-				<span class="tech-hero__star tech-hero__star--5">·</span>
-				<span class="tech-hero__star tech-hero__star--6">✦</span>
-			</div>
+			<!-- 背景细密点阵 -->
+			<div class="tech-hero__dots" aria-hidden="true"></div>
+
+			<!-- 左右两侧"工具墙"渐变条 -->
+			<span class="tech-hero__edge tech-hero__edge--left" aria-hidden="true"></span>
+			<span class="tech-hero__edge tech-hero__edge--right" aria-hidden="true"></span>
 
 			<!-- 四角 ┌ ┐ └ ┘ 装饰 -->
 			<span class="tech-hero__corner tech-hero__corner--tl" aria-hidden="true"></span>
 			<span class="tech-hero__corner tech-hero__corner--tr" aria-hidden="true"></span>
 			<span class="tech-hero__corner tech-hero__corner--bl" aria-hidden="true"></span>
 			<span class="tech-hero__corner tech-hero__corner--br" aria-hidden="true"></span>
+
+			<!-- 金色 ✦ 星点点缀 -->
+			<span class="tech-hero__spark tech-hero__spark--1" aria-hidden="true">✦</span>
+			<span class="tech-hero__spark tech-hero__spark--2" aria-hidden="true">✦</span>
+			<span class="tech-hero__spark tech-hero__spark--3" aria-hidden="true">✦</span>
+
+			<!-- 装饰：齿轮（右上角，主齿轮 + 内圈 + 中心轴孔） -->
+			<svg
+				class="tech-hero__gear tech-hero__gear--tr"
+				viewBox="0 0 100 100"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<!-- 8 颗齿（用旋转矩形拼接） -->
+				<g transform="rotate(0 50 50)"><rect x="46" y="6" width="8" height="14" rx="1.5" /></g>
+				<g transform="rotate(45 50 50)"><rect x="46" y="6" width="8" height="14" rx="1.5" /></g>
+				<g transform="rotate(90 50 50)"><rect x="46" y="6" width="8" height="14" rx="1.5" /></g>
+				<g transform="rotate(135 50 50)"><rect x="46" y="6" width="8" height="14" rx="1.5" /></g>
+				<g transform="rotate(180 50 50)"><rect x="46" y="6" width="8" height="14" rx="1.5" /></g>
+				<g transform="rotate(225 50 50)"><rect x="46" y="6" width="8" height="14" rx="1.5" /></g>
+				<g transform="rotate(270 50 50)"><rect x="46" y="6" width="8" height="14" rx="1.5" /></g>
+				<g transform="rotate(315 50 50)"><rect x="46" y="6" width="8" height="14" rx="1.5" /></g>
+				<!-- 齿轮主体 + 内圈 + 中心轴孔 -->
+				<circle cx="50" cy="50" r="32" />
+				<circle cx="50" cy="50" r="12" />
+				<circle cx="50" cy="50" r="3.5" fill="currentColor" stroke="none" />
+			</svg>
+
+			<!-- 装饰：螺丝刀（左上角，斜向放置） -->
+			<svg
+				class="tech-hero__screwdriver tech-hero__screwdriver--tl"
+				viewBox="0 0 130 40"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.6"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<!-- 握柄 -->
+				<rect x="6" y="14" width="52" height="12" rx="3" />
+				<!-- 防滑纹 -->
+				<line x1="14" y1="15" x2="14" y2="25" />
+				<line x1="20" y1="15" x2="20" y2="25" />
+				<line x1="26" y1="15" x2="26" y2="25" />
+				<line x1="32" y1="15" x2="32" y2="25" />
+				<line x1="38" y1="15" x2="38" y2="25" />
+				<line x1="44" y1="15" x2="44" y2="25" />
+				<line x1="50" y1="15" x2="50" y2="25" />
+				<!-- 金属箍 -->
+				<rect x="58" y="16" width="6" height="8" />
+				<!-- 杆部 -->
+				<line x1="64" y1="18" x2="108" y2="18" />
+				<line x1="64" y1="22" x2="108" y2="22" />
+				<!-- 一字刀头 -->
+				<path d="M 108 14 L 124 20 L 108 26 Z" fill="currentColor" stroke-linejoin="round" />
+			</svg>
+
+			<!-- 装饰：小齿轮（左下角） -->
+			<svg
+				class="tech-hero__gear tech-hero__gear--bl"
+				viewBox="0 0 100 100"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.4"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<g transform="rotate(22.5 50 50)"><rect x="47" y="10" width="6" height="10" rx="1" /></g>
+				<g transform="rotate(67.5 50 50)"><rect x="47" y="10" width="6" height="10" rx="1" /></g>
+				<g transform="rotate(112.5 50 50)"><rect x="47" y="10" width="6" height="10" rx="1" /></g>
+				<g transform="rotate(157.5 50 50)"><rect x="47" y="10" width="6" height="10" rx="1" /></g>
+				<g transform="rotate(202.5 50 50)"><rect x="47" y="10" width="6" height="10" rx="1" /></g>
+				<g transform="rotate(247.5 50 50)"><rect x="47" y="10" width="6" height="10" rx="1" /></g>
+				<g transform="rotate(292.5 50 50)"><rect x="47" y="10" width="6" height="10" rx="1" /></g>
+				<g transform="rotate(337.5 50 50)"><rect x="47" y="10" width="6" height="10" rx="1" /></g>
+				<circle cx="50" cy="50" r="28" />
+				<circle cx="50" cy="50" r="9" />
+				<circle cx="50" cy="50" r="2.5" fill="currentColor" stroke="none" />
+			</svg>
+
+			<!-- 装饰：小螺丝刀（右下角，反向斜放） -->
+			<svg
+				class="tech-hero__screwdriver tech-hero__screwdriver--br"
+				viewBox="0 0 110 36"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.4"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<!-- 刀头（一字） -->
+				<path d="M 2 14 L 18 18 L 2 22 Z" fill="currentColor" stroke-linejoin="round" />
+				<!-- 杆部 -->
+				<line x1="18" y1="16" x2="56" y2="16" />
+				<line x1="18" y1="20" x2="56" y2="20" />
+				<!-- 金属箍 -->
+				<rect x="56" y="14" width="6" height="8" />
+				<!-- 握柄 -->
+				<rect x="62" y="12" width="42" height="12" rx="3" />
+				<!-- 防滑纹 -->
+				<line x1="68" y1="13" x2="68" y2="23" />
+				<line x1="74" y1="13" x2="74" y2="23" />
+				<line x1="80" y1="13" x2="80" y2="23" />
+				<line x1="86" y1="13" x2="86" y2="23" />
+				<line x1="92" y1="13" x2="92" y2="23" />
+				<line x1="98" y1="13" x2="98" y2="23" />
+			</svg>
 
 			<div class="tech-hero__inner">
 				<!-- 顶部小帽 -->
@@ -87,7 +197,7 @@ const blocks = TECH_CATEGORY_ORDER.map((cat) => ({
 
 				<!-- 副标题 -->
 				<p class="tech-hero__subtitle">
-					一图纵览我从 2022 年至今的技术版图
+					纵览我从 2022 年至今的技术版图
 				</p>
 
 				<!-- 数据条（3 项：分类数 / 技术数 / 最早接触） -->
@@ -141,11 +251,15 @@ const blocks = TECH_CATEGORY_ORDER.map((cat) => ({
 			"JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Monaco,
 			Consolas, "Liberation Mono", "Courier New", monospace;
 		--display: "Syne", "Noto Serif SC", "Source Han Serif SC", serif;
+		--serif:
+			"Source Han Serif SC", "Noto Serif SC", "Songti SC",
+			"STSong", "SimSun", "Georgia", serif;
 		--accent: var(--primary);
+
+		/* 金色三阶（深 → 中 → 浅） */
 		--gold-deep: oklch(0.62 0.13 78);
 		--gold: oklch(0.78 0.13 85);
 		--gold-light: oklch(0.9 0.08 88);
-		--blue: oklch(0.7 0.12 230);
 
 		display: flex;
 		flex-direction: column;
@@ -159,18 +273,31 @@ const blocks = TECH_CATEGORY_ORDER.map((cat) => ({
 		position: relative;
 		overflow: hidden;
 		border-radius: var(--radius-large);
-		padding: 3rem 2rem 2.25rem;
+		padding: 4rem 2.5rem 3rem;
 		background:
-			radial-gradient(
-				ellipse at 30% 30%,
-				oklch(0.26 0.04 var(--hue)) 0%,
-				oklch(0.18 0.025 var(--hue)) 60%,
-				oklch(0.14 0.018 var(--hue)) 100%
+			linear-gradient(
+				135deg,
+				oklch(0.97 0.015 var(--hue)) 0%,
+				oklch(0.95 0.03 calc(var(--hue) + 30)) 60%,
+				oklch(0.96 0.05 calc(var(--hue) + 60)) 100%
 			);
 		box-shadow:
-			inset 0 1px 0 0 oklch(0.32 0.02 var(--hue) / 0.6),
-			0 4px 20px -4px rgb(0 0 0 / 0.4);
+			inset 0 1px 0 0 oklch(0.99 0.01 var(--hue)),
+			0 1px 2px 0 rgb(0 0 0 / 0.03);
 		animation: techHeroIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+	}
+
+	:root.dark .tech-hero {
+		background:
+			linear-gradient(
+				135deg,
+				oklch(0.22 0.018 var(--hue)) 0%,
+				oklch(0.26 0.035 calc(var(--hue) + 30)) 60%,
+				oklch(0.30 0.05 calc(var(--hue) + 60)) 100%
+			);
+		box-shadow:
+			inset 0 1px 0 0 oklch(0.32 0.02 var(--hue)),
+			0 4px 20px -4px rgb(0 0 0 / 0.4);
 	}
 
 	@keyframes techHeroIn {
@@ -184,120 +311,208 @@ const blocks = TECH_CATEGORY_ORDER.map((cat) => ({
 		}
 	}
 
-	/* 神经网底层纹理 */
-	.tech-hero__net {
+	/* 背景细密点阵 */
+	.tech-hero__dots {
 		position: absolute;
 		inset: 0;
-		pointer-events: none;
-		opacity: 0.55;
-		background-image:
-			radial-gradient(
-				oklch(0.92 0.01 var(--hue) / 0.22) 1px,
-				transparent 1px
-			),
-			radial-gradient(
-				oklch(0.78 0.13 85 / 0.18) 1px,
-				transparent 1px
-			);
-		background-size: 28px 28px, 84px 84px;
-		background-position: 0 0, 14px 14px;
-		mask-image: radial-gradient(
-			ellipse at center,
-			rgb(0 0 0) 30%,
-			transparent 80%
+		background-image: radial-gradient(
+			circle,
+			oklch(0.62 0.13 78 / 0.18) 1.2px,
+			transparent 1.2px
 		);
-		-webkit-mask-image: radial-gradient(
-			ellipse at center,
-			rgb(0 0 0) 30%,
-			transparent 80%
-		);
-	}
-
-	/* 星点装饰 */
-	.tech-hero__stars {
-		position: absolute;
-		inset: 0;
+		background-size: 22px 22px;
+		opacity: 0.6;
 		pointer-events: none;
 	}
 
-	.tech-hero__star {
-		position: absolute;
-		font-family: "Syne", serif;
-		font-weight: 700;
-		color: var(--gold);
-		opacity: 0.7;
-		line-height: 1;
-	}
-
-	.tech-hero__star--1 {
-		top: 28px;
-		left: 12%;
-		font-size: 1.25rem;
-		transform: rotate(15deg);
-	}
-	.tech-hero__star--2 {
-		top: 50%;
-		right: 8%;
-		font-size: 1rem;
+	:root.dark .tech-hero__dots {
+		background-image: radial-gradient(
+			circle,
+			oklch(0.78 0.13 85 / 0.15) 1.2px,
+			transparent 1.2px
+		);
 		opacity: 0.5;
-		transform: translateY(-50%) rotate(-10deg);
-		color: var(--gold-light);
 	}
-	.tech-hero__star--3 {
-		bottom: 60px;
-		left: 18%;
-		font-size: 1.5rem;
-		opacity: 0.6;
-		color: oklch(0.92 0.02 var(--hue));
+
+	/* 左右两侧"工具墙"渐变条（与书架页书脊呼应） */
+	.tech-hero__edge {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		width: 4px;
+		pointer-events: none;
 	}
-	.tech-hero__star--4 {
-		top: 80px;
-		right: 24%;
-		font-size: 0.875rem;
-		opacity: 0.45;
-		color: var(--blue);
+
+	.tech-hero__edge--left {
+		left: 0;
+		background: linear-gradient(180deg, var(--gold-deep) 0%, var(--gold) 60%, var(--gold-light) 100%);
+		opacity: 0.7;
 	}
-	.tech-hero__star--5 {
-		bottom: 30px;
-		right: 32%;
-		font-size: 0.75rem;
-		opacity: 0.55;
-		color: oklch(0.92 0.02 var(--hue));
+
+	.tech-hero__edge--right {
+		right: 0;
+		background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 40%, var(--gold-deep) 100%);
+		opacity: 0.7;
 	}
-	.tech-hero__star--6 {
-		top: 45%;
-		left: 6%;
-		font-size: 1.125rem;
-		opacity: 0.6;
-		color: var(--gold-deep);
+
+	:root.dark .tech-hero__edge--left,
+	:root.dark .tech-hero__edge--right {
+		opacity: 0.85;
 	}
 
 	/* 四角 ┌ ┐ └ ┘ 装饰 */
 	.tech-hero__corner {
 		position: absolute;
-		width: 24px;
-		height: 24px;
+		width: 28px;
+		height: 28px;
 		pointer-events: none;
 	}
+
 	.tech-hero__corner::before,
 	.tech-hero__corner::after {
 		content: "";
 		position: absolute;
 		background: var(--accent);
-		opacity: 0.6;
 	}
-	.tech-hero__corner--tl { top: 14px; left: 14px; }
-	.tech-hero__corner--tl::before { top: 0; left: 0; width: 100%; height: 1.5px; }
-	.tech-hero__corner--tl::after { top: 0; left: 0; width: 1.5px; height: 100%; }
-	.tech-hero__corner--tr { top: 14px; right: 14px; }
-	.tech-hero__corner--tr::before { top: 0; right: 0; width: 100%; height: 1.5px; }
-	.tech-hero__corner--tr::after { top: 0; right: 0; width: 1.5px; height: 100%; }
-	.tech-hero__corner--bl { bottom: 14px; left: 14px; }
-	.tech-hero__corner--bl::before { bottom: 0; left: 0; width: 100%; height: 1.5px; }
-	.tech-hero__corner--bl::after { bottom: 0; left: 0; width: 1.5px; height: 100%; }
-	.tech-hero__corner--br { bottom: 14px; right: 14px; }
-	.tech-hero__corner--br::before { bottom: 0; right: 0; width: 100%; height: 1.5px; }
-	.tech-hero__corner--br::after { bottom: 0; right: 0; width: 1.5px; height: 100%; }
+
+	.tech-hero__corner--tl { top: 16px; left: 16px; }
+	.tech-hero__corner--tl::before { top: 0; left: 0; width: 100%; height: 2px; }
+	.tech-hero__corner--tl::after  { top: 0; left: 0; width: 2px; height: 100%; }
+
+	.tech-hero__corner--tr { top: 16px; right: 16px; }
+	.tech-hero__corner--tr::before { top: 0; right: 0; width: 100%; height: 2px; }
+	.tech-hero__corner--tr::after  { top: 0; right: 0; width: 2px; height: 100%; }
+
+	.tech-hero__corner--bl { bottom: 16px; left: 16px; }
+	.tech-hero__corner--bl::before { bottom: 0; left: 0; width: 100%; height: 2px; }
+	.tech-hero__corner--bl::after  { bottom: 0; left: 0; width: 2px; height: 100%; }
+
+	.tech-hero__corner--br { bottom: 16px; right: 16px; }
+	.tech-hero__corner--br::before { bottom: 0; right: 0; width: 100%; height: 2px; }
+	.tech-hero__corner--br::after  { bottom: 0; right: 0; width: 2px; height: 100%; }
+
+	/* ============================================
+	   装饰：齿轮
+	   ============================================ */
+	.tech-hero__gear {
+		position: absolute;
+		pointer-events: none;
+		z-index: 1;
+		transition: opacity 0.5s ease, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.tech-hero__gear--tr {
+		top: 32px;
+		right: 110px;
+		width: 92px;
+		height: 92px;
+		color: var(--gold-deep);
+		opacity: 0.55;
+		/* 缓慢自转，强化"机械感" */
+		animation: techGearSpin 24s linear infinite;
+	}
+
+	.tech-hero__gear--bl {
+		bottom: 44px;
+		left: 60px;
+		width: 60px;
+		height: 60px;
+		color: var(--gold);
+		opacity: 0.5;
+		transform: rotate(8deg);
+		animation: techGearSpin 30s linear infinite reverse;
+	}
+
+	@keyframes techGearSpin {
+		from { transform: rotate(0deg); }
+		to   { transform: rotate(360deg); }
+	}
+
+	/* hover 时加快旋转 */
+	.tech-hero:hover .tech-hero__gear--tr {
+		opacity: 0.8;
+		animation-duration: 6s;
+	}
+	.tech-hero:hover .tech-hero__gear--bl {
+		opacity: 0.7;
+		animation-duration: 8s;
+	}
+
+	/* ============================================
+	   装饰：螺丝刀
+	   ============================================ */
+	.tech-hero__screwdriver {
+		position: absolute;
+		pointer-events: none;
+		z-index: 1;
+		transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.tech-hero__screwdriver--tl {
+		top: 44px;
+		left: 88px;
+		width: 104px;
+		height: 32px;
+		color: var(--gold-deep);
+		opacity: 0.5;
+		transform: rotate(-12deg);
+	}
+
+	.tech-hero__screwdriver--br {
+		bottom: 48px;
+		right: 88px;
+		width: 88px;
+		height: 28px;
+		color: var(--gold);
+		opacity: 0.5;
+		transform: rotate(-168deg);
+	}
+
+	.tech-hero:hover .tech-hero__screwdriver--tl {
+		opacity: 0.75;
+		transform: rotate(-7deg) translate(-1px, -1px);
+	}
+	.tech-hero:hover .tech-hero__screwdriver--br {
+		opacity: 0.7;
+		transform: rotate(-173deg) translate(1px, 1px);
+	}
+
+	/* ============================================
+	   金色 ✦ 星点
+	   ============================================ */
+	.tech-hero__spark {
+		position: absolute;
+		color: var(--gold);
+		pointer-events: none;
+		font-family: "Syne", serif;
+		font-weight: 700;
+		line-height: 1;
+	}
+
+	.tech-hero__spark--1 {
+		top: 36px;
+		right: 64px;
+		font-size: 1.375rem;
+		opacity: 0.75;
+		transform: rotate(15deg);
+	}
+
+	.tech-hero__spark--2 {
+		bottom: 60px;
+		left: 110px;
+		font-size: 1rem;
+		opacity: 0.6;
+		transform: rotate(-12deg);
+		color: var(--gold-light);
+	}
+
+	.tech-hero__spark--3 {
+		top: 50%;
+		right: 40px;
+		font-size: 0.875rem;
+		opacity: 0.55;
+		transform: translateY(-50%) rotate(20deg);
+	}
 
 	.tech-hero__inner {
 		position: relative;
@@ -305,7 +520,7 @@ const blocks = TECH_CATEGORY_ORDER.map((cat) => ({
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 1.125rem;
+		gap: 1rem;
 		text-align: center;
 	}
 
@@ -319,51 +534,51 @@ const blocks = TECH_CATEGORY_ORDER.map((cat) => ({
 		font-weight: 600;
 		letter-spacing: 0.28em;
 		text-transform: uppercase;
-		color: var(--gold);
+		color: var(--gold-deep);
 	}
 
 	.tech-hero__rule {
 		display: inline-block;
-		width: 2rem;
+		width: 2.25rem;
 		height: 1px;
 		background: linear-gradient(
 			90deg,
 			transparent 0%,
-			var(--gold) 50%,
+			var(--gold-deep) 50%,
 			transparent 100%
 		);
 	}
 
 	/* 主标题 */
 	.tech-hero__title {
-		margin: 0;
+		margin: 0.25rem 0 0;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 0.5rem;
+		gap: 0.25rem;
+		font-family: var(--serif);
 		line-height: 1;
 	}
 
 	.tech-hero__title-en {
-		font-family: var(--display);
-		font-size: 1rem;
+		font-size: 0.95rem;
 		font-style: italic;
 		font-weight: 600;
-		letter-spacing: 0.32em;
+		letter-spacing: 0.3em;
 		text-transform: uppercase;
 		color: var(--accent);
-		opacity: 0.85;
+		opacity: 0.7;
 	}
 
 	.tech-hero__title-zh {
-		font-family: var(--display);
-		font-size: clamp(2.5rem, 1.2rem + 5vw, 4.5rem);
-		font-weight: 800;
+		font-size: clamp(2.75rem, 1.5rem + 5.5vw, 5.25rem);
+		font-weight: 900;
 		letter-spacing: 0.12em;
 		background: linear-gradient(
 			180deg,
-			oklch(0.98 0.01 var(--hue)) 0%,
-			oklch(0.78 0.13 85) 100%
+			var(--gold-deep) 0%,
+			var(--gold) 60%,
+			var(--gold-light) 100%
 		);
 		-webkit-background-clip: text;
 		background-clip: text;
@@ -373,10 +588,15 @@ const blocks = TECH_CATEGORY_ORDER.map((cat) => ({
 	/* 副标题 */
 	.tech-hero__subtitle {
 		margin: 0;
-		font-family: var(--mono);
-		font-size: 0.8125rem;
-		color: oklch(0.78 0.01 var(--hue));
+		font-family: var(--serif);
+		font-size: 0.95rem;
+		color: oklch(0.5 0.02 var(--hue));
+		font-weight: 400;
 		letter-spacing: 0.05em;
+	}
+
+	:root.dark .tech-hero__subtitle {
+		color: oklch(0.7 0.015 var(--hue));
 	}
 
 	/* 数据条 */
@@ -386,8 +606,8 @@ const blocks = TECH_CATEGORY_ORDER.map((cat) => ({
 		gap: 0.875rem;
 		flex-wrap: wrap;
 		justify-content: center;
-		margin-top: 0.5rem;
-		padding-top: 1.125rem;
+		margin-top: 0.75rem;
+		padding-top: 1.25rem;
 		border-top: 1px dashed oklch(0.5 0.02 var(--hue) / 0.3);
 		font-family: var(--mono);
 	}
@@ -401,9 +621,13 @@ const blocks = TECH_CATEGORY_ORDER.map((cat) => ({
 	.tech-hero__stats-label {
 		font-size: 0.625rem;
 		font-weight: 600;
-		letter-spacing: 0.18em;
-		color: oklch(0.65 0.01 var(--hue));
+		letter-spacing: 0.16em;
+		color: oklch(0.55 0.02 var(--hue));
 		opacity: 0.7;
+	}
+
+	:root.dark .tech-hero__stats-label {
+		color: oklch(0.7 0.02 var(--hue));
 	}
 
 	.tech-hero__stats-value {
@@ -413,8 +637,9 @@ const blocks = TECH_CATEGORY_ORDER.map((cat) => ({
 		letter-spacing: 0.04em;
 		background: linear-gradient(
 			180deg,
-			oklch(0.98 0.01 var(--hue)) 0%,
-			oklch(0.78 0.13 85) 100%
+			var(--gold-deep) 0%,
+			var(--gold) 60%,
+			var(--gold-light) 100%
 		);
 		-webkit-background-clip: text;
 		background-clip: text;
@@ -462,16 +687,15 @@ const blocks = TECH_CATEGORY_ORDER.map((cat) => ({
 	   ============================================ */
 	@media (max-width: 768px) {
 		.tech-hero {
-			padding: 2rem 1.25rem 1.5rem;
+			padding: 2.5rem 1.25rem 2rem;
 		}
 		.tech-hero__corner {
-			width: 18px;
-			height: 18px;
+			width: 20px;
+			height: 20px;
 		}
-		.tech-hero__star--2,
-		.tech-hero__star--4,
-		.tech-hero__star--5,
-		.tech-hero__star--6 {
+		.tech-hero__spark,
+		.tech-hero__gear--bl,
+		.tech-hero__screwdriver {
 			display: none;
 		}
 		.tech-hero__stats {

@@ -557,7 +557,7 @@ const design: TechEntry[] = [
 		name: "Photoshop",
 		category: "设计",
 		note: "老牌图像处理王者，本博客 banner 也用它做",
-		startedAt: "2020-06",
+		startedAt: "2023-06",
 	},
 	{
 		id: "figma",
