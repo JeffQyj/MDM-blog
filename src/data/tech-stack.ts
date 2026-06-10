@@ -9,6 +9,12 @@ import type { TechEntry } from "@/types/tech";
  * - 相关文章 slug 留空表示暂未写文章
  *
  * 取消了三态分级（手写/认知/了解），所有节点统一以「金色胶囊」呈现。
+ *
+ * 数据约束：
+ * - 仅收录「编程生涯 / 二次开发 / 独立项目」分类文章中**作为技术名词被实际提及**过的项
+ * - 仅供本博客自身使用的工具（Biome、Pagefind）不收录
+ * - 单纯的开发辅助工具（Minikube）不收录，因为它本身不是技术
+ * - 一些开源中间件（如 Prometheus、ELK、XXL-JOB）也算
  */
 
 // ============================================
@@ -32,7 +38,7 @@ const languages: TechEntry[] = [
 		name: "Python",
 		category: "编程语言",
 		note: "AI 时代绕不开的胶水语言",
-		relatedPosts: ["编程生涯简洁到令人发指的python", "编程生涯进击的python"],
+		relatedPosts: ["编程生涯进击的python", "编程生涯简洁到令人发指的python"],
 		startedAt: "2024-01",
 	},
 	{
@@ -40,7 +46,7 @@ const languages: TechEntry[] = [
 		name: "JavaScript",
 		category: "编程语言",
 		note: "前端基石，从 ES5 一路学到 ES2024",
-		relatedPosts: ["编程生涯js进阶", "编程生涯从ajax到axios"],
+		relatedPosts: ["编程生涯从ajax到axios", "编程生涯js进阶"],
 		startedAt: "2022-12",
 	},
 	{
@@ -49,8 +55,8 @@ const languages: TechEntry[] = [
 		category: "编程语言",
 		note: "JS 的超集，类型让代码更稳",
 		relatedPosts: [
-			"编程生涯ts的学习",
 			"编程生涯tsjavapython三语言全栈框架认知",
+			"编程生涯ts的学习",
 		],
 		startedAt: "2024-04",
 	},
@@ -125,6 +131,14 @@ const frontend: TechEntry[] = [
 		startedAt: "2024-11",
 	},
 	{
+		id: "uni-app",
+		name: "uni-app",
+		category: "前端框架",
+		note: "DCloud 出品的跨端框架，一次编码覆盖多端小程序",
+		relatedPosts: ["编程生涯校企合作工匠工坊项目——起航"],
+		startedAt: "2024-10",
+	},
+	{
 		id: "axios",
 		name: "Axios",
 		category: "前端框架",
@@ -137,6 +151,7 @@ const frontend: TechEntry[] = [
 		name: "Tailwind CSS",
 		category: "前端框架",
 		note: "实用优先的 CSS 框架，类名即样式",
+		relatedPosts: ["独立项目ai若依帝可得"],
 		startedAt: "2024-09",
 	},
 	{
@@ -144,6 +159,7 @@ const frontend: TechEntry[] = [
 		name: "Svelte",
 		category: "前端框架",
 		note: "编译时框架，本博客也用了它做交互组件",
+		relatedPosts: ["二次开发博客诞生日志"],
 		startedAt: "2026-01",
 	},
 	{
@@ -153,6 +169,30 @@ const frontend: TechEntry[] = [
 		note: "本博客的底层框架，内容优先，岛屿架构很优雅",
 		relatedPosts: ["二次开发博客诞生日志"],
 		startedAt: "2026-01",
+	},
+	{
+		id: "element-plus",
+		name: "Element Plus",
+		category: "前端框架",
+		note: "Vue 3 官方推荐的桌面端组件库",
+		relatedPosts: ["独立项目ai若依帝可得"],
+		startedAt: "2024-06",
+	},
+	{
+		id: "ant-design",
+		name: "Ant Design",
+		category: "前端框架",
+		note: "蚂蚁出品的 React 中后台组件库",
+		relatedPosts: ["独立项目暖心领养-c-pet"],
+		startedAt: "2025-07",
+	},
+	{
+		id: "echarts",
+		name: "ECharts",
+		category: "前端框架",
+		note: "百度开源的数据可视化图表库",
+		relatedPosts: ["独立项目ai若依帝可得"],
+		startedAt: "2024-06",
 	},
 ];
 
@@ -180,11 +220,28 @@ const backend: TechEntry[] = [
 		startedAt: "2024-10",
 	},
 	{
+		id: "spring-cloud-alibaba",
+		name: "Spring Cloud Alibaba",
+		category: "后端框架",
+		note: "国产微服务全家桶，Nacos/Sentinel/Seata 一站式",
+		relatedPosts: ["独立项目天机学堂一次全面的微服务复习"],
+		startedAt: "2026-05",
+	},
+	{
 		id: "mybatis",
 		name: "MyBatis / MyBatis-Plus",
 		category: "后端框架",
 		note: "半自动 ORM，可控性与便捷性的平衡",
+		relatedPosts: ["编程生涯浙江索思java实习第一个月"],
 		startedAt: "2023-11",
+	},
+	{
+		id: "dubbo",
+		name: "Dubbo",
+		category: "后端框架",
+		note: "阿里出品的 RPC 服务治理框架",
+		relatedPosts: ["独立项目青橙商城分布式电商实战"],
+		startedAt: "2024-02",
 	},
 	{
 		id: "nodejs",
@@ -300,8 +357,8 @@ const ai: TechEntry[] = [
 		category: "AI 与 Agent",
 		note: "Anthropic 推出，让 Agent 工具即插即用",
 		relatedPosts: [
-			"独立项目ai天机学堂mcp协议mymanus智能体",
 			"编程生涯agent原理及其开发框架全览",
+			"独立项目ai天机学堂mcp协议mymanus智能体",
 		],
 		startedAt: "2026-02",
 	},
@@ -328,13 +385,21 @@ const db: TechEntry[] = [
 		startedAt: "2023-07",
 	},
 	{
+		id: "postgresql",
+		name: "PostgreSQL",
+		category: "数据库",
+		note: "学院派关系型数据库，AI 时代异军突起",
+		relatedPosts: ["独立项目ai天机学堂mcp协议mymanus智能体"],
+		startedAt: "2026-05",
+	},
+	{
 		id: "redis",
 		name: "Redis",
 		category: "数据库",
 		note: "像超快的快递柜，存取毫秒级",
 		relatedPosts: [
-			"编程生涯nosql数据库理论入门redis与mongodb",
 			"编程生涯从redis分布式锁到shell与lua脚本",
+			"编程生涯nosql数据库理论入门redis与mongodb",
 		],
 		startedAt: "2024-02",
 	},
@@ -381,7 +446,24 @@ const middleware: TechEntry[] = [
 		name: "Nginx",
 		category: "中间件",
 		note: "大楼门口的保安，帮你把请求转发到对应楼层",
+		relatedPosts: ["编程生涯elk技术栈日志处理的瑞士军刀"],
 		startedAt: "2024-03",
+	},
+	{
+		id: "websocket",
+		name: "WebSocket",
+		category: "中间件",
+		note: "全双工长连接协议，实时推送首选",
+		relatedPosts: ["独立项目黑马苍穹外卖"],
+		startedAt: "2024-05",
+	},
+	{
+		id: "xxl-job",
+		name: "XXL-JOB",
+		category: "中间件",
+		note: "分布式任务调度平台，国内中小厂标配",
+		relatedPosts: ["独立项目天机学堂一次全面的微服务复习"],
+		startedAt: "2026-05",
 	},
 ];
 
@@ -394,7 +476,10 @@ const cloud: TechEntry[] = [
 		name: "Docker",
 		category: "云原生",
 		note: "标准化的集装箱，让应用无论换哪艘船都能跑",
-		relatedPosts: ["编程生涯docker与容器化"],
+		relatedPosts: [
+			"编程生涯docker与容器化从镜像源踩坑到理解隔离的真谛",
+			"编程生涯容器编排的艺术kubernetes",
+		],
 		startedAt: "2024-07",
 	},
 	{
@@ -404,6 +489,36 @@ const cloud: TechEntry[] = [
 		note: "容器编排的艺术，集群调度的事实标准",
 		relatedPosts: ["编程生涯容器编排的艺术kubernetes"],
 		startedAt: "2025-05",
+	},
+];
+
+// ============================================
+// 监控与可观测性
+// ============================================
+const observability: TechEntry[] = [
+	{
+		id: "prometheus",
+		name: "Prometheus",
+		category: "监控与可观测性",
+		note: "云原生时代的事实标准指标采集系统",
+		relatedPosts: ["编程生涯主流项目监控技术栈解析"],
+		startedAt: "2026-06",
+	},
+	{
+		id: "grafana",
+		name: "Grafana",
+		category: "监控与可观测性",
+		note: "颜值与实力并存的可视化面板",
+		relatedPosts: ["编程生涯主流项目监控技术栈解析"],
+		startedAt: "2026-06",
+	},
+	{
+		id: "elk",
+		name: "ELK",
+		category: "监控与可观测性",
+		note: "Elasticsearch + Logstash + Kibana，日志瑞士军刀",
+		relatedPosts: ["编程生涯elk技术栈日志处理的瑞士军刀"],
+		startedAt: "2024-02",
 	},
 ];
 
@@ -424,6 +539,7 @@ const tooling: TechEntry[] = [
 		name: "Maven",
 		category: "工程化与工具",
 		note: "Java 项目的事实构建工具",
+		relatedPosts: ["编程生涯从xml配置地狱到springboot自动配置"],
 		startedAt: "2023-04",
 	},
 	{
@@ -431,28 +547,24 @@ const tooling: TechEntry[] = [
 		name: "Vite",
 		category: "工程化与工具",
 		note: "新一代前端构建工具，启动毫秒级",
+		relatedPosts: ["独立项目ai若依帝可得"],
 		startedAt: "2024-09",
-	},
-	{
-		id: "biome",
-		name: "Biome",
-		category: "工程化与工具",
-		note: "一个工具取代 ESLint + Prettier，前端 lint 的新选择",
-		startedAt: "2026-01",
-	},
-	{
-		id: "pagefind",
-		name: "Pagefind",
-		category: "工程化与工具",
-		note: "本博客用的静态搜索，零配置",
-		startedAt: "2026-01",
 	},
 	{
 		id: "swagger",
 		name: "Swagger / OpenAPI",
 		category: "工程化与工具",
 		note: "REST API 的文档标准，前后端协作桥梁",
+		relatedPosts: ["编程生涯浙江索思java实习第一个月"],
 		startedAt: "2024-09",
+	},
+	{
+		id: "arthas",
+		name: "Arthas",
+		category: "工程化与工具",
+		note: "阿里出品的 Java 在线诊断神器",
+		relatedPosts: ["编程生涯java底层jvm"],
+		startedAt: "2026-05",
 	},
 ];
 
@@ -535,16 +647,8 @@ const system: TechEntry[] = [
 		name: "Docker Compose",
 		category: "系统与底层",
 		note: "本地多容器编排，与 K8s 互补",
-		relatedPosts: ["编程生涯docker与容器化"],
+		relatedPosts: ["编程生涯docker与容器化从镜像源踩坑到理解隔离的真谛"],
 		startedAt: "2024-07",
-	},
-	{
-		id: "minikube",
-		name: "Minikube",
-		category: "系统与底层",
-		note: "本地的 K8s 集群，学习 K8s 必备",
-		relatedPosts: ["编程生涯容器编排的艺术kubernetes"],
-		startedAt: "2025-05",
 	},
 ];
 
@@ -552,13 +656,6 @@ const system: TechEntry[] = [
 // 设计
 // ============================================
 const design: TechEntry[] = [
-	{
-		id: "photoshop",
-		name: "Photoshop",
-		category: "设计",
-		note: "老牌图像处理王者，本博客 banner 也用它做",
-		startedAt: "2023-06",
-	},
 	{
 		id: "figma",
 		name: "Figma",
@@ -580,6 +677,7 @@ export const techStack: TechEntry[] = [
 	...db,
 	...middleware,
 	...cloud,
+	...observability,
 	...tooling,
 	...dataScience,
 	...system,
