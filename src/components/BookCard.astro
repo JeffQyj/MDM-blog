@@ -1,0 +1,628 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { Icon } from "astro-icon/components";
+import I18nKey from "../i18n/i18nKey";
+import { i18n } from "../i18n/translation";
+import { getPostUrlBySlug, getTagUrl } from "@utils/url-utils";
+import ImageWrapper from "./misc/ImageWrapper.astro";
+
+interface Props {
+	entry: CollectionEntry<"posts">;
+	index: number;
+	class?: string;
+	style?: string;
+}
+
+const { entry, index, class: className, style } = Astro.props;
+
+const { title, published, tags, category, image, description } = entry.data;
+
+// 摘要：description 优先，fallback 到 remark 提取的 excerpt
+const { remarkPluginFrontmatter } = await entry.render();
+const summary = description || remarkPluginFrontmatter?.excerpt || "";
+const readMinutes = Math.max(1, remarkPluginFrontmatter?.minutes || 1);
+
+// 是否存在封面图：空字符串视为缺图
+const hasCover =
+	image !== undefined && image !== null && String(image).trim() !== "";
+
+// 从标题中提取纯书名（去掉「个人杂谈：」前缀与《》书名号）用于占位条
+const plainTitle = String(title)
+	.replace(/^个人杂谈[：:]/, "")
+	.replace(/[《》]/g, "");
+
+// 序号格式化：01、02、03 ...
+const indexText = String(index).padStart(2, "0");
+
+// 发布日期格式化
+const publishDate = published as Date;
+const publishDateText = publishDate
+	? `${publishDate.getFullYear()}-${String(publishDate.getMonth() + 1).padStart(2, "0")}-${String(publishDate.getDate()).padStart(2, "0")}`
+	: "";
+
+// 阅读时长文本（i18n）
+const readMinutesText = `${readMinutes} ${i18n(readMinutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}`;
+
+// 仅展示前 3 个标签（第一个好书分享在样式上高亮）
+const visibleTags = (tags ?? []).slice(0, 3);
+
+const url = getPostUrlBySlug(entry.slug);
+---
+
+<article
+	class:list={["book-card group", className]}
+	style={style}
+	aria-label={title}
+>
+	<!-- 书签丝带：卡片右上角（永远在 cover 容器之上） -->
+	<span class="book-card__ribbon" aria-hidden="true"></span>
+
+	<!-- 主体：左侧封面（2:3 竖向） + 右侧元信息 -->
+	<div class="book-card__inner">
+		<!-- 左侧：封面（2:3 竖向，含书脊色条） -->
+		<a href={url} class="book-card__cover-link" aria-label={title}>
+			{hasCover ? (
+				<div class="book-card__cover-wrap">
+					<ImageWrapper
+						src={image}
+						basePath="assets/books/"
+						alt={title}
+						position="center"
+						class="book-card__cover-img"
+					/>
+					<!-- 书脊色条：封面右侧 6px 宽渐变带 -->
+					<span class="book-card__spine" aria-hidden="true"></span>
+				</div>
+			) : (
+				<div class="book-card__cover-wrap book-card__cover-wrap--placeholder">
+					<div class="book-card__cover-placeholder">
+						<span class="book-card__placeholder-eyebrow">COVER PENDING</span>
+						<span class="book-card__placeholder-title">{plainTitle}</span>
+						<span class="book-card__placeholder-hint">封面待补</span>
+					</div>
+				</div>
+			)}
+		</a>
+
+		<!-- 右侧：元信息 -->
+		<div class="book-card__body">
+			<!-- 序号 + 分类 -->
+			<div class="book-card__head">
+				<span class="book-card__index" aria-hidden="true">#{indexText}</span>
+				{category && (
+					<span class="book-card__category">
+						<span class="book-card__category-dot" aria-hidden="true"></span>
+						{category}
+					</span>
+				)}
+			</div>
+
+			<!-- 标题 -->
+			<a href={url} class="book-card__title" aria-label={title}>
+				{title}
+			</a>
+
+			<!-- 描述（2 行截断） -->
+			{summary && <p class="book-card__summary">{summary}</p>}
+
+			<!-- 标签 chips -->
+			{visibleTags.length > 0 && (
+				<div class="book-card__tags" aria-label="标签">
+					{visibleTags.map((tag, i) => (
+						<a
+							href={getTagUrl(tag)}
+							class:list={[
+								"book-card__tag",
+								i === 0 && tag === "好书分享" ? "book-card__tag--primary" : "",
+							]}
+							aria-label={`查看标签为 ${tag} 的所有文章`}
+						>
+							#{tag.trim()}
+						</a>
+					))}
+				</div>
+			)}
+
+			<!-- 底部：元数据 + READ -->
+			<footer class="book-card__footer">
+				<div class="book-card__meta">
+					<span class="book-card__meta-item">
+						<Icon name="material-symbols:calendar-today-rounded" class="book-card__meta-icon" />
+						<time datetime={published?.toISOString?.()}>{publishDateText}</time>
+					</span>
+					<span class="book-card__meta-item">
+						<Icon name="material-symbols:schedule-rounded" class="book-card__meta-icon" />
+						<span>{readMinutesText}</span>
+					</span>
+				</div>
+				<a
+					href={url}
+					aria-label={`阅读 ${title}`}
+					class="book-card__read-btn"
+				>
+					<span class="book-card__read-text">READ</span>
+					<Icon name="material-symbols:arrow-forward-rounded" class="book-card__read-arrow" />
+				</a>
+			</footer>
+		</div>
+	</div>
+</article>
+
+<style>
+	/* ============================================
+	   Tokens
+	   ============================================ */
+	.book-card {
+		--mono:
+			"JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Monaco,
+			Consolas, "Liberation Mono", "Courier New", monospace;
+		--serif: "Syne", "Noto Serif SC", "Source Han Serif SC", serif;
+		--accent: var(--primary);
+
+		/* 金色三阶（深 → 中 → 浅） */
+		--gold-deep: oklch(0.62 0.13 78);
+		--gold: oklch(0.78 0.13 85);
+		--gold-light: oklch(0.9 0.08 88);
+
+		position: relative;
+		display: block;
+		padding: 1.5rem 1.5rem 1.25rem;
+		border-radius: var(--radius-large);
+		background:
+			linear-gradient(180deg, oklch(1 0 0 / 0.7) 0%, oklch(1 0 0 / 0.9) 100%),
+			var(--card-bg);
+		box-shadow:
+			inset 0 0 0 1px oklch(0.5 0.02 var(--hue) / 0.1),
+			0 1px 2px 0 rgb(0 0 0 / 0.04);
+		overflow: hidden;
+		transition:
+			transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+			box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+		animation: bookCardIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+	}
+
+	:root.dark .book-card {
+		background:
+			linear-gradient(180deg, oklch(0.23 0.015 var(--hue) / 0.85) 0%, oklch(0.23 0.015 var(--hue) / 0.95) 100%),
+			var(--card-bg);
+		box-shadow:
+			inset 0 0 0 1px oklch(0.7 0.02 var(--hue) / 0.12),
+			0 4px 14px -6px rgb(0 0 0 / 0.45);
+	}
+
+	.book-card:hover {
+		transform: translateY(-3px);
+		box-shadow:
+			inset 0 0 0 1px oklch(0.5 0.02 var(--hue) / 0.18),
+			0 14px 32px -10px oklch(0.5 0.1 var(--hue) / 0.3);
+	}
+
+	:root.dark .book-card:hover {
+		box-shadow:
+			inset 0 0 0 1px oklch(0.7 0.02 var(--hue) / 0.2),
+			0 14px 32px -10px rgb(0 0 0 / 0.6);
+	}
+
+	@keyframes bookCardIn {
+		from {
+			opacity: 0;
+			transform: translateY(16px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	/* ============================================
+	   书签丝带（卡片右上角，永远在最顶层）
+	   ============================================ */
+	.book-card__ribbon {
+		position: absolute;
+		top: 0;
+		right: 1.25rem;
+		width: 18px;
+		height: 28px;
+		background: linear-gradient(180deg, var(--gold-deep) 0%, var(--gold) 100%);
+		clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%);
+		z-index: 5;
+		pointer-events: none;
+		opacity: 0.85;
+		box-shadow: 0 2px 6px -1px oklch(0.5 0.1 78 / 0.5);
+	}
+
+	:root.dark .book-card__ribbon {
+		opacity: 0.95;
+	}
+
+	.book-card:hover .book-card__ribbon {
+		opacity: 1;
+	}
+
+	/* ============================================
+	   内部布局：左封面 + 右信息
+	   ============================================ */
+	.book-card__inner {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 1.25rem;
+	}
+
+	@media (min-width: 768px) {
+		.book-card__inner {
+			grid-template-columns: 180px 1fr;
+			gap: 1.5rem;
+		}
+	}
+
+	/* ============================================
+	   左侧：封面（2:3 竖向）
+	   ============================================ */
+	.book-card__cover-link {
+		display: block;
+		text-decoration: none;
+		color: inherit;
+	}
+
+	.book-card__cover-wrap {
+		position: relative;
+		width: 100%;
+		max-width: 240px;
+		margin: 0 auto;
+		aspect-ratio: 2 / 3;
+		border-radius: 6px;
+		overflow: hidden;
+		background:
+			linear-gradient(180deg, oklch(0.62 0.13 78 / 0.08) 0%, oklch(0.78 0.13 85 / 0.12) 100%);
+		box-shadow:
+			inset 0 0 0 1px oklch(0.62 0.13 78 / 0.4),
+			0 6px 18px -6px oklch(0.3 0.05 78 / 0.35);
+		transition: box-shadow 0.4s ease, transform 0.4s ease;
+	}
+
+	:root.dark .book-card__cover-wrap {
+		background:
+			linear-gradient(180deg, oklch(0.25 0.04 var(--hue) / 0.4) 0%, oklch(0.2 0.04 var(--hue) / 0.5) 100%);
+		box-shadow:
+			inset 0 0 0 1px oklch(0.78 0.13 85 / 0.4),
+			0 6px 18px -6px rgb(0 0 0 / 0.6);
+	}
+
+	@media (min-width: 768px) {
+		.book-card__cover-wrap {
+			max-width: 100%;
+		}
+	}
+
+	.book-card:hover .book-card__cover-wrap {
+		transform: scale(1.03);
+		box-shadow:
+			inset 0 0 0 2px oklch(0.62 0.13 78 / 0.7),
+			0 12px 28px -8px oklch(0.3 0.05 78 / 0.5);
+	}
+
+	:root.dark .book-card:hover .book-card__cover-wrap {
+		box-shadow:
+			inset 0 0 0 2px oklch(0.78 0.13 85 / 0.7),
+			0 12px 28px -8px rgb(0 0 0 / 0.7);
+	}
+
+	/* 封面图（ImageWrapper 自带 w-full h-full + object-cover） */
+	.book-card__cover-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+	}
+
+	/* 书脊色条：封面右侧 6px 渐变带 */
+	.book-card__spine {
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: 6px;
+		height: 100%;
+		background: linear-gradient(180deg, var(--gold-deep) 0%, var(--gold) 60%, var(--gold-light) 100%);
+		box-shadow: inset 1px 0 1px 0 oklch(0 0 0 / 0.2);
+		pointer-events: none;
+	}
+
+	/* ============================================
+	   缺图降级：书脊占位条
+	   ============================================ */
+	.book-card__cover-wrap--placeholder {
+		background:
+			linear-gradient(180deg, oklch(0.62 0.13 78 / 0.18) 0%, oklch(0.78 0.13 85 / 0.22) 100%);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	:root.dark .book-card__cover-wrap--placeholder {
+		background:
+			linear-gradient(180deg, oklch(0.25 0.05 var(--hue) / 0.5) 0%, oklch(0.2 0.05 var(--hue) / 0.6) 100%);
+	}
+
+	.book-card__cover-placeholder {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		padding: 1rem 0.75rem;
+		gap: 0.5rem;
+		color: oklch(0.4 0.05 78);
+	}
+
+	:root.dark .book-card__cover-placeholder {
+		color: oklch(0.75 0.06 85);
+	}
+
+	.book-card__placeholder-eyebrow {
+		font-family: var(--mono);
+		font-size: 0.625rem;
+		font-weight: 700;
+		letter-spacing: 0.18em;
+		opacity: 0.7;
+	}
+
+	.book-card__placeholder-title {
+		font-family: var(--serif);
+		font-size: 1rem;
+		font-weight: 700;
+		line-height: 1.3;
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		max-width: 95%;
+	}
+
+	.book-card__placeholder-hint {
+		font-family: var(--serif);
+		font-size: 0.75rem;
+		font-style: italic;
+		opacity: 0.7;
+	}
+
+	/* ============================================
+	   右侧：元信息
+	   ============================================ */
+	.book-card__body {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		min-width: 0;
+	}
+
+	/* 顶部：序号 + 分类 */
+	.book-card__head {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		flex-wrap: wrap;
+	}
+
+	.book-card__index {
+		font-family: var(--mono);
+		font-size: 0.6875rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		color: var(--accent);
+		opacity: 0.65;
+		font-feature-settings: "tnum" 1;
+	}
+
+	.book-card__category {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4375rem;
+		padding: 0.25rem 0.625rem 0.25rem 0.5rem;
+		border-radius: 2px;
+		background: var(--btn-regular-bg);
+		font-family: var(--mono);
+		font-size: 0.6875rem;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		color: oklch(0.5 0.05 var(--hue));
+	}
+
+	:root.dark .book-card__category {
+		color: oklch(0.75 0.04 var(--hue));
+	}
+
+	.book-card__category-dot {
+		width: 8px;
+		height: 8px;
+		background: var(--accent);
+		display: inline-block;
+		flex-shrink: 0;
+	}
+
+	/* 标题 */
+	.book-card__title {
+		font-family: var(--serif);
+		font-size: 1.25rem;
+		line-height: 1.32;
+		font-weight: 800;
+		color: oklch(0.25 0.02 var(--hue));
+		text-decoration: none;
+		padding-left: 0.875rem;
+		position: relative;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		transition: color 0.3s ease;
+	}
+
+	:root.dark .book-card__title {
+		color: oklch(0.93 0.01 var(--hue));
+	}
+
+	.book-card__title::before {
+		content: "";
+		position: absolute;
+		left: 0;
+		top: 0.5rem;
+		bottom: 0.5rem;
+		width: 3px;
+		border-radius: 2px;
+		background: linear-gradient(180deg, var(--gold-deep) 0%, var(--gold) 100%);
+	}
+
+	.book-card__title:hover {
+		color: var(--accent);
+	}
+
+	/* 描述 */
+	.book-card__summary {
+		margin: 0;
+		font-size: 0.875rem;
+		line-height: 1.6;
+		color: oklch(0.5 0.02 var(--hue));
+		font-style: italic;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	:root.dark .book-card__summary {
+		color: oklch(0.72 0.015 var(--hue));
+	}
+
+	/* 标签 chips */
+	.book-card__tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.375rem;
+	}
+
+	.book-card__tag {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.1875rem 0.5rem;
+		border-radius: 2px;
+		background: oklch(0.95 0.02 var(--hue) / 0.7);
+		border: 1px solid oklch(0.55 0.02 var(--hue) / 0.18);
+		font-family: var(--mono);
+		font-size: 0.6875rem;
+		font-weight: 500;
+		color: oklch(0.4 0.04 var(--hue));
+		letter-spacing: 0.02em;
+		text-decoration: none;
+		transition: background 0.3s ease, color 0.3s ease;
+	}
+
+	:root.dark .book-card__tag {
+		background: oklch(0.28 0.02 var(--hue) / 0.7);
+		border-color: oklch(0.7 0.02 var(--hue) / 0.2);
+		color: oklch(0.78 0.02 var(--hue));
+	}
+
+	.book-card__tag:hover {
+		background: var(--btn-regular-bg-hover);
+		color: var(--accent);
+	}
+
+	/* 好书分享标签：金色高亮 */
+	.book-card__tag--primary {
+		background: linear-gradient(180deg, var(--gold-deep) 0%, var(--gold) 100%);
+		border-color: var(--gold-deep);
+		color: oklch(0.2 0.02 80);
+		font-weight: 700;
+	}
+
+	.book-card__tag--primary:hover {
+		background: linear-gradient(180deg, var(--gold) 0%, var(--gold-light) 100%);
+		color: oklch(0.2 0.02 80);
+	}
+
+	/* ============================================
+	   底部：元数据 + READ
+	   ============================================ */
+	.book-card__footer {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		margin-top: auto;
+		padding-top: 0.5rem;
+	}
+
+	.book-card__meta {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		font-family: var(--mono);
+		font-size: 0.6875rem;
+		color: oklch(0.55 0.02 var(--hue));
+	}
+
+	:root.dark .book-card__meta {
+		color: oklch(0.7 0.02 var(--hue));
+	}
+
+	.book-card__meta-item {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+	}
+
+	.book-card__meta-icon {
+		font-size: 0.875rem;
+		opacity: 0.7;
+	}
+
+	/* READ 按钮 */
+	.book-card__read-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: 0.4375rem 0.75rem;
+		border-radius: 999px;
+		background: var(--btn-regular-bg);
+		color: var(--accent);
+		font-family: var(--mono);
+		font-size: 0.6875rem;
+		font-weight: 800;
+		letter-spacing: 0.1em;
+		text-decoration: none;
+		transition:
+			background 0.35s ease,
+			transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.book-card__read-btn:hover {
+		background: var(--btn-regular-bg-hover);
+		transform: translateX(3px);
+	}
+
+	.book-card__read-arrow {
+		font-size: 0.95rem;
+	}
+
+	/* ============================================
+	   移动端适配
+	   ============================================ */
+	@media (max-width: 767px) {
+		/* 移动端：竖向布局（封面上 + 信息下） */
+		.book-card {
+			padding: 1.25rem 1.25rem 1.125rem;
+		}
+		.book-card__title {
+			font-size: 1.125rem;
+		}
+		.book-card__meta {
+			font-size: 0.625rem;
+			gap: 0.5rem;
+		}
+		.book-card__ribbon {
+			right: 1rem;
+			width: 16px;
+			height: 24px;
+		}
+	}
+</style>

@@ -131,13 +131,11 @@ export function createStarField(): StarFieldHandle {
 			positions[i * 3 + 1] = r * Math.cos(phi);
 			positions[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
 
-			sizes[i] =
-				cfg.sizeMin + Math.random() * (cfg.sizeMax - cfg.sizeMin);
+			sizes[i] = cfg.sizeMin + Math.random() * (cfg.sizeMax - cfg.sizeMin);
 			phases[i] = Math.random() * Math.PI * 2;
 			freqs[i] =
 				(2 * Math.PI) /
-				(cfg.twinkleMin +
-					Math.random() * (cfg.twinkleMax - cfg.twinkleMin));
+				(cfg.twinkleMin + Math.random() * (cfg.twinkleMax - cfg.twinkleMin));
 
 			// 颜色：随机选 hue + 偏白（v2：sat 0.15-0.4 → 0.05-0.2，更偏白）
 			const hue = cfg.hues[Math.floor(Math.random() * cfg.hues.length)];

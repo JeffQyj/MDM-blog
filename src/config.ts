@@ -50,6 +50,7 @@ export const navBarConfig: NavBarConfig = {
 		LinkPreset.Projects,
 		LinkPreset.Featured,
 		LinkPreset.Tech,
+		LinkPreset.Bookshelf,
 		LinkPreset.About,
 		LinkPreset.Archive,
 	],

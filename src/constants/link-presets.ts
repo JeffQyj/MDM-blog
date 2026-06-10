@@ -27,4 +27,8 @@ export const LinkPresets: { [key in LinkPreset]: NavBarLink } = {
 		name: i18n(I18nKey.tech),
 		url: "/tech/",
 	},
+	[LinkPreset.Bookshelf]: {
+		name: i18n(I18nKey.bookshelf),
+		url: "/bookshelf/",
+	},
 };

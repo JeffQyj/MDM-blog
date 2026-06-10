@@ -167,7 +167,9 @@ onMount(() => {
 		const edgeIds = new Set(
 			lines3D.edges
 				.filter(
-					(e) => e.type === "strong" && (e.source === node.id || e.target === node.id),
+					(e) =>
+						e.type === "strong" &&
+						(e.source === node.id || e.target === node.id),
 				)
 				.map((e) => e.id),
 		);

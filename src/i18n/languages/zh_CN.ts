@@ -9,6 +9,7 @@ export const zh_CN: Translation = {
 	[Key.projects]: "项目",
 	[Key.search]: "搜索",
 	[Key.tech]: "技术",
+	[Key.bookshelf]: "书架",
 
 	[Key.tags]: "标签",
 	[Key.categories]: "分类",

@@ -9,6 +9,7 @@ export const th: Translation = {
 	[Key.projects]: "โปรเจกต์",
 	[Key.search]: "ค้นหา",
 	[Key.tech]: "เทคโนโลยี",
+	[Key.bookshelf]: "ชั้นหนังสือ",
 
 	[Key.tags]: "ป้ายกำกับ",
 	[Key.categories]: "หมวดหมู่",

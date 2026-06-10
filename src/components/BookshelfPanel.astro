@@ -1,0 +1,510 @@
+---
+import type { CollectionEntry } from "astro:content";
+import BookCard from "./BookCard.astro";
+
+interface Props {
+	posts: CollectionEntry<"posts">[];
+}
+
+const { posts } = Astro.props;
+
+// 预渲染所有 entry，拿到 excerpt + minutes
+const renderedPosts = await Promise.all(
+	posts.map(async (entry) => {
+		const { remarkPluginFrontmatter } = await entry.render();
+		return { entry, remarkPluginFrontmatter };
+	}),
+);
+
+// Hero 派生数据
+const totalCount = renderedPosts.length;
+
+// 累计阅读总时长（分钟）
+const totalMinutes = renderedPosts.reduce(
+	(sum, p) => sum + Math.max(1, p.remarkPluginFrontmatter?.minutes || 0),
+	0,
+);
+const totalHours = Math.floor(totalMinutes / 60);
+const totalMinutesRem = totalMinutes % 60;
+const totalTimeText =
+	totalHours > 0
+		? `${totalHours} h ${totalMinutesRem} m`
+		: `${totalMinutes} min`;
+
+// 最新入架日期
+const latestDate = renderedPosts[0]?.entry.data.published;
+const latestDateText = latestDate
+	? `${latestDate.getFullYear()}-${String(latestDate.getMonth() + 1).padStart(2, "0")}-${String(latestDate.getDate()).padStart(2, "0")}`
+	: "—";
+---
+
+<div class="bookshelf-page">
+	<!-- ============================================
+	     Hero 英雄区
+	     ============================================ -->
+	{posts.length > 0 && (
+		<section
+			class="bookshelf-hero"
+			style="animation-delay: calc(var(--content-delay) + 0ms);"
+		>
+			<!-- 装饰层：背景细密点阵 -->
+			<div class="bookshelf-hero__dots" aria-hidden="true"></div>
+
+			<!-- 装饰层：左右两条"书脊"渐变（拟书架边缘） -->
+			<span class="bookshelf-hero__spine bookshelf-hero__spine--left" aria-hidden="true"></span>
+			<span class="bookshelf-hero__spine bookshelf-hero__spine--right" aria-hidden="true"></span>
+
+			<!-- 四角 ┌ ┐ └ ┘ 装饰 -->
+			<span class="bookshelf-hero__corner bookshelf-hero__corner--tl" aria-hidden="true"></span>
+			<span class="bookshelf-hero__corner bookshelf-hero__corner--tr" aria-hidden="true"></span>
+			<span class="bookshelf-hero__corner bookshelf-hero__corner--bl" aria-hidden="true"></span>
+			<span class="bookshelf-hero__corner bookshelf-hero__corner--br" aria-hidden="true"></span>
+
+			<!-- 金色 ✦ 星点点缀 -->
+			<span class="bookshelf-hero__spark bookshelf-hero__spark--1" aria-hidden="true">✦</span>
+			<span class="bookshelf-hero__spark bookshelf-hero__spark--2" aria-hidden="true">✦</span>
+			<span class="bookshelf-hero__spark bookshelf-hero__spark--3" aria-hidden="true">✦</span>
+
+			<div class="bookshelf-hero__inner">
+				<!-- 顶部小帽 -->
+				<div class="bookshelf-hero__eyebrow">
+					<span class="bookshelf-hero__rule"></span>
+					<span class="bookshelf-hero__eyebrow-text">READING SHELF · 私人书架</span>
+					<span class="bookshelf-hero__rule"></span>
+				</div>
+
+				<!-- 巨型主标题 -->
+				<h1 class="bookshelf-hero__title">
+					<span class="bookshelf-hero__title-en">Bookshelf</span>
+					<span class="bookshelf-hero__title-zh">书　架</span>
+				</h1>
+
+				<!-- 副标题 -->
+				<p class="bookshelf-hero__subtitle">
+					精心收录的每一本，都曾照亮某个深夜
+				</p>
+
+				<!-- 数据条（3 项：藏书数 / 最新入架 / 阅读总时长） -->
+				<div class="bookshelf-hero__meta">
+					<span class="bookshelf-hero__meta-item">
+						<span class="bookshelf-hero__meta-label">TOTAL</span>
+						<span class="bookshelf-hero__meta-value">{totalCount}</span>
+					</span>
+					<span class="bookshelf-hero__meta-dot" aria-hidden="true">·</span>
+					<span class="bookshelf-hero__meta-item">
+						<span class="bookshelf-hero__meta-label">LATEST</span>
+						<span class="bookshelf-hero__meta-value">{latestDateText}</span>
+					</span>
+					<span class="bookshelf-hero__meta-dot" aria-hidden="true">·</span>
+					<span class="bookshelf-hero__meta-item">
+						<span class="bookshelf-hero__meta-label">SHELVED</span>
+						<span class="bookshelf-hero__meta-value">{totalTimeText}</span>
+					</span>
+				</div>
+			</div>
+		</section>
+	)}
+
+	<!-- ============================================
+	     空状态
+	     ============================================ -->
+	{posts.length === 0 && (
+		<div class="bookshelf-empty">
+			<p class="bookshelf-empty__text">
+				暂无书架收录，去给想要展示的文章加上 <code>tags: [好书分享, ...]</code> 吧。
+			</p>
+		</div>
+	)}
+
+	<!-- ============================================
+	     书籍卡片网格
+	     ============================================ -->
+	{posts.length > 0 && (
+		<section class="bookshelf-grid" aria-label="书架列表">
+			{renderedPosts.map(({ entry }, i) => (
+				<BookCard
+					entry={entry}
+					index={i + 1}
+					style={`animation-delay: calc(var(--content-delay) + ${(i + 1) * 60}ms);`}
+				/>
+			))}
+		</section>
+	)}
+</div>
+
+<style>
+	/* ============================================
+	   Tokens
+	   ============================================ */
+	.bookshelf-page {
+		--mono:
+			"JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Monaco,
+			Consolas, "Liberation Mono", "Courier New", monospace;
+		--display: "Syne", "Noto Serif SC", "Source Han Serif SC", serif;
+		--serif:
+			"Source Han Serif SC", "Noto Serif SC", "Songti SC",
+			"STSong", "SimSun", "Georgia", serif;
+		--accent: var(--primary);
+
+		/* 金色三阶（深 → 中 → 浅） */
+		--gold-deep: oklch(0.62 0.13 78);
+		--gold: oklch(0.78 0.13 85);
+		--gold-light: oklch(0.9 0.08 88);
+
+		display: flex;
+		flex-direction: column;
+		gap: 1.75rem;
+	}
+
+	/* ============================================
+	   Hero 英雄区
+	   ============================================ */
+	.bookshelf-hero {
+		position: relative;
+		overflow: hidden;
+		border-radius: var(--radius-large);
+		padding: 4rem 2.5rem 3rem;
+		background:
+			linear-gradient(
+				135deg,
+				oklch(0.97 0.015 var(--hue)) 0%,
+				oklch(0.95 0.03 calc(var(--hue) + 30)) 60%,
+				oklch(0.96 0.05 calc(var(--hue) + 60)) 100%
+			);
+		box-shadow:
+			inset 0 1px 0 0 oklch(0.99 0.01 var(--hue)),
+			0 1px 2px 0 rgb(0 0 0 / 0.03);
+		animation: bookshelfHeroIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+	}
+
+	:root.dark .bookshelf-hero {
+		background:
+			linear-gradient(
+				135deg,
+				oklch(0.22 0.018 var(--hue)) 0%,
+				oklch(0.26 0.035 calc(var(--hue) + 30)) 60%,
+				oklch(0.30 0.05 calc(var(--hue) + 60)) 100%
+			);
+		box-shadow:
+			inset 0 1px 0 0 oklch(0.32 0.02 var(--hue)),
+			0 4px 20px -4px rgb(0 0 0 / 0.4);
+	}
+
+	@keyframes bookshelfHeroIn {
+		from { opacity: 0; transform: translateY(-8px); }
+		to { opacity: 1; transform: translateY(0); }
+	}
+
+	/* 背景细密点阵 */
+	.bookshelf-hero__dots {
+		position: absolute;
+		inset: 0;
+		background-image: radial-gradient(
+			circle,
+			oklch(0.62 0.13 78 / 0.18) 1.2px,
+			transparent 1.2px
+		);
+		background-size: 22px 22px;
+		opacity: 0.6;
+		pointer-events: none;
+	}
+
+	:root.dark .bookshelf-hero__dots {
+		background-image: radial-gradient(
+			circle,
+			oklch(0.78 0.13 85 / 0.15) 1.2px,
+			transparent 1.2px
+		);
+		opacity: 0.5;
+	}
+
+	/* 装饰：左右"书脊"渐变条（拟书架边缘） */
+	.bookshelf-hero__spine {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		width: 4px;
+		pointer-events: none;
+	}
+
+	.bookshelf-hero__spine--left {
+		left: 0;
+		background: linear-gradient(180deg, var(--gold-deep) 0%, var(--gold) 60%, var(--gold-light) 100%);
+		opacity: 0.7;
+	}
+
+	.bookshelf-hero__spine--right {
+		right: 0;
+		background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 40%, var(--gold-deep) 100%);
+		opacity: 0.7;
+	}
+
+	:root.dark .bookshelf-hero__spine--left,
+	:root.dark .bookshelf-hero__spine--right {
+		opacity: 0.85;
+	}
+
+	/* 四角 ┌ ┐ └ ┘ 装饰 */
+	.bookshelf-hero__corner {
+		position: absolute;
+		width: 28px;
+		height: 28px;
+		pointer-events: none;
+	}
+
+	.bookshelf-hero__corner::before,
+	.bookshelf-hero__corner::after {
+		content: "";
+		position: absolute;
+		background: var(--accent);
+	}
+
+	.bookshelf-hero__corner--tl { top: 16px; left: 16px; }
+	.bookshelf-hero__corner--tl::before { top: 0; left: 0; width: 100%; height: 2px; }
+	.bookshelf-hero__corner--tl::after  { top: 0; left: 0; width: 2px; height: 100%; }
+
+	.bookshelf-hero__corner--tr { top: 16px; right: 16px; }
+	.bookshelf-hero__corner--tr::before { top: 0; right: 0; width: 100%; height: 2px; }
+	.bookshelf-hero__corner--tr::after  { top: 0; right: 0; width: 2px; height: 100%; }
+
+	.bookshelf-hero__corner--bl { bottom: 16px; left: 16px; }
+	.bookshelf-hero__corner--bl::before { bottom: 0; left: 0; width: 100%; height: 2px; }
+	.bookshelf-hero__corner--bl::after  { bottom: 0; left: 0; width: 2px; height: 100%; }
+
+	.bookshelf-hero__corner--br { bottom: 16px; right: 16px; }
+	.bookshelf-hero__corner--br::before { bottom: 0; right: 0; width: 100%; height: 2px; }
+	.bookshelf-hero__corner--br::after  { bottom: 0; right: 0; width: 2px; height: 100%; }
+
+	/* 金色 ✦ 星点 */
+	.bookshelf-hero__spark {
+		position: absolute;
+		color: var(--gold);
+		pointer-events: none;
+		font-family: "Syne", serif;
+		font-weight: 700;
+		line-height: 1;
+	}
+
+	.bookshelf-hero__spark--1 {
+		top: 40px;
+		right: 80px;
+		font-size: 1.5rem;
+		opacity: 0.75;
+		transform: rotate(15deg);
+	}
+
+	.bookshelf-hero__spark--2 {
+		bottom: 56px;
+		left: 100px;
+		font-size: 1.125rem;
+		opacity: 0.6;
+		transform: rotate(-12deg);
+		color: var(--gold-light);
+	}
+
+	.bookshelf-hero__spark--3 {
+		top: 50%;
+		right: 40px;
+		font-size: 0.875rem;
+		opacity: 0.55;
+		transform: translateY(-50%) rotate(20deg);
+	}
+
+	.bookshelf-hero__inner {
+		position: relative;
+		z-index: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1rem;
+		text-align: center;
+	}
+
+	/* 顶部小帽 */
+	.bookshelf-hero__eyebrow {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.875rem;
+		font-family: var(--mono);
+		font-size: 0.6875rem;
+		font-weight: 600;
+		letter-spacing: 0.28em;
+		text-transform: uppercase;
+		color: var(--gold-deep);
+	}
+
+	.bookshelf-hero__rule {
+		display: inline-block;
+		width: 2.25rem;
+		height: 1px;
+		background: linear-gradient(
+			90deg,
+			transparent 0%,
+			var(--gold-deep) 50%,
+			transparent 100%
+		);
+	}
+
+	/* 主标题 */
+	.bookshelf-hero__title {
+		margin: 0.25rem 0 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.25rem;
+		font-family: var(--serif);
+		line-height: 1;
+	}
+
+	.bookshelf-hero__title-en {
+		font-size: 0.95rem;
+		font-style: italic;
+		font-weight: 600;
+		letter-spacing: 0.3em;
+		text-transform: uppercase;
+		color: var(--accent);
+		opacity: 0.7;
+	}
+
+	.bookshelf-hero__title-zh {
+		font-size: clamp(2.75rem, 1.5rem + 5.5vw, 5.25rem);
+		font-weight: 900;
+		letter-spacing: 0.12em;
+		background: linear-gradient(
+			180deg,
+			var(--gold-deep) 0%,
+			var(--gold) 60%,
+			var(--gold-light) 100%
+		);
+		-webkit-background-clip: text;
+		background-clip: text;
+		-webkit-text-fill-color: transparent;
+	}
+
+	/* 副标题 */
+	.bookshelf-hero__subtitle {
+		margin: 0;
+		font-family: var(--serif);
+		font-size: 0.95rem;
+		color: oklch(0.5 0.02 var(--hue));
+		font-weight: 400;
+		letter-spacing: 0.05em;
+	}
+
+	:root.dark .bookshelf-hero__subtitle {
+		color: oklch(0.7 0.015 var(--hue));
+	}
+
+	/* 数据条（3 项） */
+	.bookshelf-hero__meta {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.875rem;
+		flex-wrap: wrap;
+		justify-content: center;
+		margin-top: 0.75rem;
+		padding-top: 1.25rem;
+		border-top: 1px dashed oklch(0.5 0.02 var(--hue) / 0.3);
+		font-family: var(--mono);
+	}
+
+	.bookshelf-hero__meta-item {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.4rem;
+	}
+
+	.bookshelf-hero__meta-label {
+		font-size: 0.625rem;
+		font-weight: 600;
+		letter-spacing: 0.16em;
+		color: oklch(0.55 0.02 var(--hue));
+		opacity: 0.7;
+	}
+
+	:root.dark .bookshelf-hero__meta-label {
+		color: oklch(0.7 0.02 var(--hue));
+	}
+
+	.bookshelf-hero__meta-value {
+		font-size: 0.95rem;
+		font-weight: 800;
+		font-feature-settings: "tnum" 1;
+		letter-spacing: 0.04em;
+		background: linear-gradient(
+			180deg,
+			var(--gold-deep) 0%,
+			var(--gold) 60%,
+			var(--gold-light) 100%
+		);
+		-webkit-background-clip: text;
+		background-clip: text;
+		-webkit-text-fill-color: transparent;
+	}
+
+	.bookshelf-hero__meta-dot {
+		color: oklch(0.6 0.02 var(--hue));
+		opacity: 0.4;
+		font-size: 1.1rem;
+	}
+
+	/* ============================================
+	   空状态
+	   ============================================ */
+	.bookshelf-empty {
+		text-align: center;
+		padding: 4rem 1rem;
+		color: oklch(0.55 0.02 var(--hue));
+		font-size: 0.95rem;
+	}
+
+	:root.dark .bookshelf-empty {
+		color: oklch(0.7 0.015 var(--hue));
+	}
+
+	.bookshelf-empty__text code {
+		font-family: var(--mono);
+		background: var(--btn-regular-bg);
+		padding: 0.1rem 0.4rem;
+		border-radius: 4px;
+		color: var(--accent);
+		font-size: 0.85em;
+	}
+
+	/* ============================================
+	   书籍网格（双列）
+	   ============================================ */
+	.bookshelf-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 1.5rem;
+	}
+
+	@media (min-width: 768px) {
+		.bookshelf-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	/* ============================================
+	   移动端适配
+	   ============================================ */
+	@media (max-width: 767px) {
+		.bookshelf-hero {
+			padding: 2.5rem 1.25rem 2rem;
+		}
+		.bookshelf-hero__corner {
+			width: 20px;
+			height: 20px;
+		}
+		.bookshelf-hero__spark {
+			display: none;
+		}
+		.bookshelf-hero__meta {
+			gap: 0.5rem;
+		}
+		.bookshelf-hero__meta-dot {
+			display: none;
+		}
+	}
+</style>

@@ -1,0 +1,13 @@
+---
+import BookshelfPanel from "@components/BookshelfPanel.astro";
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { getBookshelfPosts } from "../utils/content-utils";
+
+const bookshelfPosts = await getBookshelfPosts();
+---
+
+<MainGridLayout title={i18n(I18nKey.bookshelf)}>
+    <BookshelfPanel posts={bookshelfPosts}></BookshelfPanel>
+</MainGridLayout>

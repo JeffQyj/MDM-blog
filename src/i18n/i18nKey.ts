@@ -6,6 +6,7 @@ enum I18nKey {
 	projects = "projects",
 	search = "search",
 	tech = "tech",
+	bookshelf = "bookshelf",
 
 	tags = "tags",
 	categories = "categories",

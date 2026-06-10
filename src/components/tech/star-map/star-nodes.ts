@@ -24,7 +24,11 @@ import {
 	Vector3,
 } from "three";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
-import type { PositionedNode, PositionedNodeMap, StarNodesHandle } from "./types";
+import type {
+	PositionedNode,
+	PositionedNodeMap,
+	StarNodesHandle,
+} from "./types";
 
 const INTRO_DURATION = 1.4;
 const VERT = /* glsl */ `
@@ -202,8 +206,7 @@ export function createStarNodes(nodes: PositionedNode[]): StarNodesHandle {
 				label.position.copy(cur);
 				label.position.y += n.size * 2.4;
 				// 入场前 30% 隐藏；高亮或正常态显示
-				label.visible =
-					introT >= 0.3 && (isHi || globalFadeTarget > 0.95);
+				label.visible = introT >= 0.3 && (isHi || globalFadeTarget > 0.95);
 			}
 			mesh.instanceMatrix.needsUpdate = true;
 		},

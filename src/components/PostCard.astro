@@ -35,6 +35,12 @@ const className = Astro.props.class;
 
 const hasCover = image !== undefined && image !== null && image !== "";
 
+// 好书分享文章：封面图统一放在 src/assets/books/，需走 BookCard 同款 basePath
+const isBookShare = (tags ?? []).includes("好书分享");
+const coverBasePath = isBookShare
+	? "assets/books/"
+	: path.join("content/posts/", getDir(entry.id));
+
 const { remarkPluginFrontmatter } = await entry.render();
 ---
 <div
@@ -109,7 +115,7 @@ const { remarkPluginFrontmatter } = await entry.render();
                 <div class="post-card__cover">
                     <ImageWrapper
                         src={image}
-                        basePath={path.join("content/posts/", getDir(entry.id))}
+                        basePath={coverBasePath}
                         alt="Cover Image of the Post"
                         class="post-card__cover-img"
                     ></ImageWrapper>

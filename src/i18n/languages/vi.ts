@@ -9,6 +9,7 @@ export const vi: Translation = {
 	[Key.projects]: "Dự án",
 	[Key.search]: "Tìm kiếm",
 	[Key.tech]: "Công nghệ",
+	[Key.bookshelf]: "Kệ sách",
 
 	[Key.tags]: "Thẻ",
 	[Key.categories]: "Danh mục",

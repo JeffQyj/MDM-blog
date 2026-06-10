@@ -220,7 +220,12 @@ export function createNebula(): NebulaHandle {
 	group.add(bandMesh);
 
 	// === 球状核心（银心）===
-	const coreGeo = new PlaneGeometry(CORE_CONFIG.width, CORE_CONFIG.height, 1, 1);
+	const coreGeo = new PlaneGeometry(
+		CORE_CONFIG.width,
+		CORE_CONFIG.height,
+		1,
+		1,
+	);
 	const coreMat = new ShaderMaterial({
 		vertexShader: CORE_VERT,
 		fragmentShader: CORE_FRAG,

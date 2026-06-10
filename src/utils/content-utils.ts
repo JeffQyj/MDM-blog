@@ -64,6 +64,13 @@ export async function getProjectPosts(): Promise<CollectionEntry<"posts">[]> {
 			post.data.category === "独立项目" || post.data.category === "二次开发",
 	);
 }
+
+// 书架页使用：标签中包含 "好书分享" 的全部已发布文章，按 published 倒序
+// 返回完整 entry（含 body）供 Astro 组件在构建时调用 entry.render()
+export async function getBookshelfPosts(): Promise<CollectionEntry<"posts">[]> {
+	const allPosts = await getRawSortedPosts();
+	return allPosts.filter((post) => (post.data.tags ?? []).includes("好书分享"));
+}
 export type Tag = {
 	name: string;
 	count: number;

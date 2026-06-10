@@ -37,7 +37,12 @@ const STRONG_OPACITY = 0.7;
 const PARTICLES_PER_EDGE = 3;
 
 export function createConstellationLines(
-	edges: { id: string; source: string; target: string; type: "category" | "strong" }[],
+	edges: {
+		id: string;
+		source: string;
+		target: string;
+		type: "category" | "strong";
+	}[],
 	nodes: PositionedNode[],
 ): ConstellationLinesHandle {
 	const group = new Group();
@@ -177,9 +182,7 @@ export function createConstellationLines(
 			(strongMat as LineBasicMaterial).opacity = STRONG_OPACITY * strongScale;
 
 			// 能量流粒子位置更新
-			const posAttr = particleGeo.getAttribute(
-				"position",
-			) as BufferAttribute;
+			const posAttr = particleGeo.getAttribute("position") as BufferAttribute;
 			for (let i = 0; i < strong.length; i++) {
 				const e = strong[i];
 				const s = idToNode.get(e.source)!;
@@ -187,7 +190,7 @@ export function createConstellationLines(
 				for (let j = 0; j < PARTICLES_PER_EDGE; j++) {
 					const idx = i * PARTICLES_PER_EDGE + j;
 					// 错相位：3 颗粒子均匀分布，沿边往复
-					const phase = ((t * 0.6 + j / PARTICLES_PER_EDGE) % 1 + 1) % 1;
+					const phase = (((t * 0.6 + j / PARTICLES_PER_EDGE) % 1) + 1) % 1;
 					const px = s.position.x + (tn.position.x - s.position.x) * phase;
 					const py = s.position.y + (tn.position.y - s.position.y) * phase;
 					const pz = s.position.z + (tn.position.z - s.position.z) * phase;

@@ -226,11 +226,7 @@ export function setupInteraction(opts: InteractionOptions): InteractionHandle {
 	const onKeyDown = (ev: KeyboardEvent) => {
 		// 仅在画布或其子元素 focus 时响应
 		const active = document.activeElement;
-		if (
-			active &&
-			active !== domElement &&
-			!domElement.contains(active)
-		) {
+		if (active && active !== domElement && !domElement.contains(active)) {
 			return;
 		}
 		switch (ev.key) {
@@ -284,11 +280,7 @@ export function setupInteraction(opts: InteractionOptions): InteractionHandle {
 		const pos: number[] = [];
 		for (let i = 0; i <= RING_SEGMENTS; i++) {
 			const angle = (i / RING_SEGMENTS) * Math.PI * 2;
-			pos.push(
-				Math.cos(angle) * radius,
-				Math.sin(angle) * radius,
-				0,
-			);
+			pos.push(Math.cos(angle) * radius, Math.sin(angle) * radius, 0);
 		}
 		geo.setAttribute("position", new Float32BufferAttribute(pos, 3));
 		const mat = new LineBasicMaterial({
