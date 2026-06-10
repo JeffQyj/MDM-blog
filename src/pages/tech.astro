@@ -1,17 +1,54 @@
 ---
-import StarMap3D from "@components/tech/StarMap3D.svelte";
+import { getCollection } from "astro:content";
+import CategoryBlock from "@components/tech/CategoryBlock.svelte";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { techStack } from "@/data/tech-stack";
+import {
+	TECH_CATEGORY_ORDER,
+	type TechCategory,
+	type TechEntry,
+} from "@/types/tech";
+import { buildPostIndex, type PostIndex } from "@/utils/tech-page-utils";
+
+// 1) 加载所有已发布文章，构建「标题 → 文章链接」索引
+const allPosts = await getCollection("posts", ({ data }) => {
+	return import.meta.env.PROD ? data.draft !== true : true;
+});
+const postIndex: PostIndex = buildPostIndex(allPosts);
+
+// 2) 按分类分组（只保留 TECH_CATEGORY_ORDER 中存在的分类）
+const grouped: Record<string, TechEntry[]> = {};
+for (const t of techStack) {
+	const list = grouped[t.category] ?? [];
+	list.push(t);
+	grouped[t.category] = list;
+}
+
+// 3) 全局数据
+const categoryCount = TECH_CATEGORY_ORDER.length;
+const techCount = techStack.length;
+const earliestStartedAt =
+	techStack
+		.map((t) => t.startedAt)
+		.filter((v): v is string => Boolean(v))
+		.sort()[0] ?? "—";
+
+// 4) 顺序渲染 11 个分类区块
+const blocks = TECH_CATEGORY_ORDER.map((cat) => ({
+	category: cat as TechCategory,
+	entries: grouped[cat] ?? [],
+}));
 ---
 
 <MainGridLayout
 	title={i18n(I18nKey.tech)}
-	description="技术神经图谱：罗列我学过与认知到的技术栈"
+	description="技术全景图：罗列我学过与认知到的技术栈"
 >
 	<div class="tech-page">
 		<!-- ============================================
-		     Hero 英雄区（神经网 + 星点风格，呼应项目页）
+		     Hero 英雄区（沿用神经网 + 金色渐变风）
 		     ============================================ -->
 		<section
 			class="tech-hero"
@@ -38,7 +75,7 @@ import MainGridLayout from "@layouts/MainGridLayout.astro";
 				<!-- 顶部小帽 -->
 				<div class="tech-hero__eyebrow">
 					<span class="tech-hero__rule"></span>
-					<span class="tech-hero__eyebrow-text">NEURAL · MAP　技　术　星　图</span>
+					<span class="tech-hero__eyebrow-text">PANORAMA · 技　术　全　景　图</span>
 					<span class="tech-hero__rule"></span>
 				</div>
 
@@ -50,18 +87,48 @@ import MainGridLayout from "@layouts/MainGridLayout.astro";
 
 				<!-- 副标题 -->
 				<p class="tech-hero__subtitle">
-					欢迎探索我的技术宇宙
+					一图纵览我从 2022 年至今的技术版图
 				</p>
+
+				<!-- 数据条（3 项：分类数 / 技术数 / 最早接触） -->
+				<div class="tech-hero__stats">
+					<span class="tech-hero__stats-item">
+						<span class="tech-hero__stats-label">CATEGORIES</span>
+						<span class="tech-hero__stats-value">{categoryCount}</span>
+					</span>
+					<span class="tech-hero__stats-dot" aria-hidden="true">·</span>
+					<span class="tech-hero__stats-item">
+						<span class="tech-hero__stats-label">TECH</span>
+						<span class="tech-hero__stats-value">{techCount}</span>
+					</span>
+					<span class="tech-hero__stats-dot" aria-hidden="true">·</span>
+					<span class="tech-hero__stats-item">
+						<span class="tech-hero__stats-label">SINCE</span>
+						<span class="tech-hero__stats-value">{earliestStartedAt}</span>
+					</span>
+				</div>
 			</div>
 		</section>
 
 		<!-- ============================================
-		     主舞台：Three.js 3D 星图
-		     client:only 避免 SSR（依赖 window）
+		     11 个分类区块（每块 = 分类胶囊 + 节点网格）
+		     弹窗在 CategoryBlock 内由 Svelte 客户端处理
 		     ============================================ -->
-		<div class="tech-stage">
-			<StarMap3D client:only="svelte" />
-		</div>
+		<section class="tech-blocks" aria-label="技术分类">
+			{blocks.map(({ category, entries }, i) => (
+				<div
+					class="tech-block-wrapper"
+					style={`animation-delay: calc(var(--content-delay) + ${(i + 1) * 50}ms);`}
+				>
+					<CategoryBlock
+						client:load
+						category={category}
+						entries={entries}
+						postIndex={postIndex}
+					/>
+				</div>
+			))}
+		</section>
 	</div>
 </MainGridLayout>
 
@@ -82,7 +149,7 @@ import MainGridLayout from "@layouts/MainGridLayout.astro";
 
 		display: flex;
 		flex-direction: column;
-		gap: 1.25rem;
+		gap: 1.5rem;
 	}
 
 	/* ============================================
@@ -117,7 +184,7 @@ import MainGridLayout from "@layouts/MainGridLayout.astro";
 		}
 	}
 
-	/* 神经网底层纹理（双层点阵 + 微弱连线） */
+	/* 神经网底层纹理 */
 	.tech-hero__net {
 		position: absolute;
 		inset: 0;
@@ -312,29 +379,82 @@ import MainGridLayout from "@layouts/MainGridLayout.astro";
 		letter-spacing: 0.05em;
 	}
 
-	.tech-hero__subtitle-sep {
-		opacity: 0.4;
-		margin: 0 0.25rem;
+	/* 数据条 */
+	.tech-hero__stats {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.875rem;
+		flex-wrap: wrap;
+		justify-content: center;
+		margin-top: 0.5rem;
+		padding-top: 1.125rem;
+		border-top: 1px dashed oklch(0.5 0.02 var(--hue) / 0.3);
+		font-family: var(--mono);
 	}
 
-	/* 操作提示 */
-	.tech-hero__hint {
-		margin: 0;
-		font-family: var(--mono);
-		font-size: 0.6875rem;
+	.tech-hero__stats-item {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.4rem;
+	}
+
+	.tech-hero__stats-label {
+		font-size: 0.625rem;
+		font-weight: 600;
 		letter-spacing: 0.18em;
 		color: oklch(0.65 0.01 var(--hue));
 		opacity: 0.7;
-		padding-top: 0.5rem;
+	}
+
+	.tech-hero__stats-value {
+		font-size: 0.95rem;
+		font-weight: 800;
+		font-feature-settings: "tnum" 1;
+		letter-spacing: 0.04em;
+		background: linear-gradient(
+			180deg,
+			oklch(0.98 0.01 var(--hue)) 0%,
+			oklch(0.78 0.13 85) 100%
+		);
+		-webkit-background-clip: text;
+		background-clip: text;
+		-webkit-text-fill-color: transparent;
+	}
+
+	.tech-hero__stats-dot {
+		color: oklch(0.6 0.02 var(--hue));
+		opacity: 0.4;
+		font-size: 1.1rem;
 	}
 
 	/* ============================================
-	   主舞台
+	   分类区块容器（统一动画 + 入场效果）
 	   ============================================ */
-	.tech-stage {
-		position: relative;
-		border-radius: var(--radius-large);
-		overflow: hidden;
+	.tech-blocks {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 1rem;
+	}
+
+	@media (min-width: 1024px) {
+		.tech-blocks {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	.tech-block-wrapper {
+		animation: techBlockIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+	}
+
+	@keyframes techBlockIn {
+		from {
+			opacity: 0;
+			transform: translateY(6px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 
 	/* ============================================
@@ -354,9 +474,11 @@ import MainGridLayout from "@layouts/MainGridLayout.astro";
 		.tech-hero__star--6 {
 			display: none;
 		}
-		.tech-hero__hint {
-			font-size: 0.625rem;
-			letter-spacing: 0.12em;
+		.tech-hero__stats {
+			gap: 0.5rem;
+		}
+		.tech-hero__stats-dot {
+			display: none;
 		}
 	}
 </style>
