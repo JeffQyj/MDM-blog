@@ -74,9 +74,10 @@ interface ParsedBlock {
 function parseQAPairs(body: string): QA[] {
 	const re = /^:::(tip|note)\r?\n([\s\S]*?)\r?\n:::/gm;
 	const blocks: ParsedBlock[] = [];
-	let m: RegExpExecArray | null;
-	while ((m = re.exec(body)) !== null) {
+	let m: RegExpExecArray | null = re.exec(body);
+	while (m !== null) {
 		blocks.push({ type: m[1], content: m[2] });
+		m = re.exec(body);
 	}
 
 	const qaList: QA[] = [];

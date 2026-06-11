@@ -581,9 +581,7 @@ const cloud: TechEntry[] = [
 		name: "Docker",
 		category: "云原生",
 		note: "标准化的集装箱，让应用无论换哪艘船都能跑",
-		relatedPosts: [
-			"编程生涯容器编排的艺术kubernetes",
-		],
+		relatedPosts: ["编程生涯容器编排的艺术kubernetes"],
 		startedAt: "2024-07",
 	},
 	{

@@ -64,10 +64,12 @@ function getFirstLetter(str: string): string {
 const groupedTags = new Map<string, typeof tags>();
 tags.forEach((tag) => {
 	const letter = getFirstLetter(tag.name);
-	if (!groupedTags.has(letter)) {
-		groupedTags.set(letter, []);
+	const existing = groupedTags.get(letter);
+	if (existing) {
+		existing.push(tag);
+	} else {
+		groupedTags.set(letter, [tag]);
 	}
-	groupedTags.get(letter)!.push(tag);
 });
 
 const sortedLetters = Array.from(groupedTags.keys()).sort((a, b) =>

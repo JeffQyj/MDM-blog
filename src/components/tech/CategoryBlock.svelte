@@ -1,7 +1,7 @@
 <script lang="ts">
+import type { Action } from "svelte/action";
 import type { TechCategory, TechEntry } from "@/types/tech";
 import { type PostIndex, resolveRelatedPosts } from "@/utils/tech-page-utils";
-import type { Action } from "svelte/action";
 
 type Props = {
 	category: TechCategory;
