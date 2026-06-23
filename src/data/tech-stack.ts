@@ -491,6 +491,25 @@ const middleware: TechEntry[] = [
 		startedAt: "2024-04",
 	},
 	{
+		id: "solace",
+		name: "Solace PubSub+",
+		category: "中间件",
+		note: "多协议事件代理，Event Mesh 全球分发的隐形冠军",
+		relatedPosts: ["编程生涯企业级消息中间件solace"],
+		startedAt: "2026-06",
+	},
+	{
+		id: "apache-camel",
+		name: "Apache Camel",
+		category: "中间件",
+		note: "基于 EIP 的集成框架，胶水编程的瑞士军刀",
+		relatedPosts: [
+			"编程生涯胶水编程道法术器全维度",
+			"编程生涯企业级消息中间件solace",
+		],
+		startedAt: "2026-06",
+	},
+	{
 		id: "nginx",
 		name: "Nginx",
 		category: "中间件",
