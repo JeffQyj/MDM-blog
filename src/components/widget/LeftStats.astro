@@ -10,21 +10,21 @@ const birthdayISO = siteConfig.leftStats.birthday;
 const codingStartISO = siteConfig.leftStats.codingStart;
 
 // 列表项 label 中的 <span> 标签由客户端 JS 注入文本；set:html 渲染，来源受信任
-	const items: { label: string }[] = [
-		{ label: `本站累计输出内容已达 ${totalWords.toLocaleString()} 字数` },
-		{
-			label: `浏览本站所有文章所需时长大约为 ${totalMinutes.toLocaleString()} 分钟`,
-		},
-        {
-			label: `博主玩地球 online 已经 <span id="days-alive" data-birthday="${birthdayISO}">…</span> 天了`,
-		},
-		{
-			label: `博主的地球 online 主线已经过到 <span id="years-alive" data-birthday="${birthdayISO}">…</span> 关了`,
-		},
-		{
-			label: `博主的编程生涯已经 <span id="days-coding" data-coding-start="${codingStartISO}">…</span> 天了`,
-		},
-	];
+const items: { label: string }[] = [
+	{ label: `本站累计输出内容已达 ${totalWords.toLocaleString()} 字数` },
+	{
+		label: `浏览本站所有文章所需时长大约为 ${totalMinutes.toLocaleString()} 分钟`,
+	},
+	{
+		label: `博主玩地球 online 已经 <span id="days-alive" data-birthday="${birthdayISO}">…</span> 天了`,
+	},
+	{
+		label: `博主的地球 online 主线已经过到 <span id="years-alive" data-birthday="${birthdayISO}">…</span> 关了`,
+	},
+	{
+		label: `博主的编程生涯已经 <span id="days-coding" data-coding-start="${codingStartISO}">…</span> 天了`,
+	},
+];
 ---
 
 <div class="left-stats-card">
