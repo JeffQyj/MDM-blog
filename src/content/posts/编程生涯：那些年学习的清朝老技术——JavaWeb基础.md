@@ -171,7 +171,7 @@ public class LifeCycleServlet extends HttpServlet {
 
 JSP（JavaServer Pages）是"在 HTML 里写 Java"，或者说是"让 HTML 看起来像 Java"。
 
-```jsp
+```html
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <!DOCTYPE html>

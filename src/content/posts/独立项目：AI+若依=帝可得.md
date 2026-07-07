@@ -817,7 +817,7 @@ public class GenTableServiceImpl {
 
 **实体类生成模板示例**（entity.java.vm）：
 
-```vm
+```txt
 package ${packageName};
 
 #if(${tableComment} != '')

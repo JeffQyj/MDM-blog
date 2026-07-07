@@ -67,7 +67,7 @@ Redis之所以快，是因为它把数据存在内存里，省去了磁盘IO的�
 | **Set** | SADD/SMEMBERS | 无序去重集合 | 标签系统、好友关系 |
 | **Zset** | ZADD/ZRANGE | 带分数的排序集合 | 排行榜、权重队列 |
 
-```redis
+```sql
 -- String类型：最简单的key-value
 SET user:1001 "张三"
 GET user:1001
@@ -134,7 +134,7 @@ Redis快是快了，但数据存在内存里，万一断电怎么办？
 
 Redis的发布订阅（Pub/Sub）是一种简单的消息通信模式：发布者往指定频道发送消息，订阅该频道的订阅者会收到消息。
 
-```redis
+```sql
 -- 订阅者：订阅news频道
 SUBSCRIBE news
 
@@ -151,7 +151,7 @@ PUBLISH news "Redis 7.0发布了！"
 
 Redis的事务不像MySQL那样严格，它只是把命令打包执行，中间不会插入其他命令。但如果想要更复杂的原子性操作，就需要用Lua脚本。
 
-```redis
+```sql
 -- Redis事务示例：先减库存，再创建订单，要么全成功，要么全失败
 MULTI
 DECR stock:1001
@@ -482,7 +482,7 @@ public class UserService {
 
 Redis的内存是有限的，如果不小心存了大对象或者没设置过期时间，很容易爆内存。
 
-```redis
+```sql
 -- 坑1：没设置过期时间，数据永驻内存
 SET huge_data "这里是超大的数据..."  -- 永不过期
 TTL huge_data  -- 返回-1，表示永不过期
