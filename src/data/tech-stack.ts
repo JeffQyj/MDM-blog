@@ -427,6 +427,46 @@ const ai: TechEntry[] = [
 		relatedPosts: ["编程生涯agent原理及其开发框架全览"],
 		startedAt: "2026-05",
 	},
+	{
+		id: "hermes-agent",
+		name: "Hermes Agent",
+		category: "AI 与 Agent",
+		note: "Nous Research 出品的自进化 Agent 框架，支持 25+ 消息平台",
+		relatedPosts: ["编程生涯hermes-agent"],
+		startedAt: "2026-07",
+	},
+	{
+		id: "cursor",
+		name: "Cursor",
+		category: "AI 与 Agent",
+		note: "AI 编程 IDE 标杆，从 Tab 补全一路到 Agent 模式",
+		relatedPosts: ["编程生涯hermes-agent", "编程生涯ai大模型认知之旅"],
+		startedAt: "2025-10",
+	},
+	{
+		id: "claude-code",
+		name: "Claude Code",
+		category: "AI 与 Agent",
+		note: "终端里的全自治编程 Agent，shell 权限一把梭",
+		relatedPosts: ["编程生涯hermes-agent", "编程生涯ai大模型认知之旅"],
+		startedAt: "2025-11",
+	},
+	{
+		id: "manus",
+		name: "Manus",
+		category: "AI 与 Agent",
+		note: "通用 Agent 产品代表，自己查资料做 PPT 那种",
+		relatedPosts: ["编程生涯hermes-agent"],
+		startedAt: "2026-01",
+	},
+	{
+		id: "ollama",
+		name: "Ollama",
+		category: "AI 与 Agent",
+		note: "本地大模型运行时，OpenAI 协议兼容让切换无感",
+		relatedPosts: ["编程生涯hermes-agent"],
+		startedAt: "2026-07",
+	},
 ];
 
 // ============================================
@@ -475,6 +515,14 @@ const db: TechEntry[] = [
 		note: "全文检索与日志分析利器，ELK 中的 E",
 		relatedPosts: ["编程生涯elk技术栈日志处理的瑞士军刀"],
 		startedAt: "2024-12",
+	},
+	{
+		id: "sqlite",
+		name: "SQLite",
+		category: "数据库",
+		note: "嵌入式数据库，Hermes 的 state.db / kanban.db 都靠它",
+		relatedPosts: ["编程生涯hermes-agent"],
+		startedAt: "2026-07",
 	},
 ];
 
