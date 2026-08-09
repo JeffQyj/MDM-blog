@@ -53,14 +53,14 @@ const items: { label: string }[] = [
         setInterval(update, 60_000); // 每分钟刷新
     }
 
-    // 绑定周岁年龄 span：保留一位小数，每分钟刷新
+    // 绑定周岁年龄 span：保留两位小数，每分钟刷新
     function bindYearsSpan(id: string, isoDate: string) {
         const start = new Date(isoDate).getTime();
         const msPerYear = 365.2422 * 24 * 60 * 60 * 1000;
         const update = () => {
             const el = document.getElementById(id);
             if (!el) return;
-            el.textContent = ((Date.now() - start) / msPerYear).toFixed(1);
+            el.textContent = ((Date.now() - start) / msPerYear).toFixed(2);
         };
         update();
         setInterval(update, 60_000); // 每分钟刷新
